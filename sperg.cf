@@ -38,7 +38,7 @@ LList.      Lit     ::= "[" [Elem] "]" ;
 LLambda.    Lit     ::= "{" [Param] "|" [Stmt] "}" ;
 
 separator Elem "," ;
-_.          Elem    ::= Expr ;
+Elem.       Elem    ::= Expr ;
 
 separator Param "," ;
-_.          Param   ::= Ident ;
+Param.      Param   ::= Ident ;
