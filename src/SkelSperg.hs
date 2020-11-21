@@ -23,8 +23,9 @@ transExpr :: AbsSperg.Expr -> Result
 transExpr x = case x of
   AbsSperg.EIdent ident -> failure x
   AbsSperg.ELit lit -> failure x
+  AbsSperg.EPlace -> failure x
   AbsSperg.EApply expr1 expr2 -> failure x
-  AbsSperg.ETrigger expr -> failure x
+  AbsSperg.EForce expr -> failure x
   AbsSperg.EMul expr1 expr2 -> failure x
   AbsSperg.EDiv expr1 expr2 -> failure x
   AbsSperg.EMod expr1 expr2 -> failure x
@@ -39,8 +40,9 @@ transExpr x = case x of
   AbsSperg.ENEqual expr1 expr2 -> failure x
   AbsSperg.EAnd expr1 expr2 -> failure x
   AbsSperg.EOr expr1 expr2 -> failure x
-  AbsSperg.ESend expr1 expr2 -> failure x
+  AbsSperg.EShove expr1 expr2 -> failure x
   AbsSperg.EIfThen expr1 expr2 expr3 -> failure x
+  AbsSperg.ELetIn binds expr -> failure x
 transLit :: AbsSperg.Lit -> Result
 transLit x = case x of
   AbsSperg.LInt integer -> failure x
@@ -50,12 +52,9 @@ transLit x = case x of
   AbsSperg.LTrue -> failure x
   AbsSperg.LFalse -> failure x
   AbsSperg.LVoid -> failure x
-  AbsSperg.LList elems -> failure x
-  AbsSperg.LLambda params stmts expr -> failure x
-transElem :: AbsSperg.Elem -> Result
-transElem x = case x of
-  AbsSperg.Elem expr -> failure x
-transParam :: AbsSperg.Param -> Result
-transParam x = case x of
-  AbsSperg.Param ident -> failure x
+  AbsSperg.LList exprs -> failure x
+  AbsSperg.LLambda idents expr -> failure x
+transBind :: AbsSperg.Bind -> Result
+transBind x = case x of
+  AbsSperg.Bind ident expr -> failure x
 

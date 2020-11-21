@@ -133,7 +133,7 @@ alex_table = listArray (0 :: Int, 2991)
   , 40
   , 40
   , 0
-  , 0
+  , 41
   , 43
   , 43
   , 43
@@ -3129,7 +3129,7 @@ alex_check = listArray (0 :: Int, 2991)
   , 61
   , 62
   , -1
-  , -1
+  , 64
   , 65
   , 66
   , 67
@@ -6252,7 +6252,7 @@ eitherResIdent tv s = treeFind resWords
                               | s == a = t
 
 resWords :: BTree
-resWords = b "==" 17 (b "-" 9 (b ")" 5 (b "%" 3 (b "!=" 2 (b "!" 1 N N) N) (b "(" 4 N N)) (b "+" 7 (b "*" 6 N N) (b "," 8 N N))) (b ";" 13 (b "/" 11 (b "->" 10 N N) (b "::" 12 N N)) (b "<=" 15 (b "<" 14 N N) (b "=" 16 N N)))) (b "let" 26 (b "and" 22 (b "[" 20 (b ">=" 19 (b ">" 18 N N) N) (b "]" 21 N N)) (b "false" 24 (b "else" 23 N N) (b "if" 25 N N))) (b "void" 30 (b "then" 28 (b "or" 27 N N) (b "true" 29 N N)) (b "|" 32 (b "{" 31 N N) (b "}" 33 N N))))
+resWords = b ">" 18 (b "-" 9 (b ")" 5 (b "%" 3 (b "!=" 2 (b "!" 1 N N) N) (b "(" 4 N N)) (b "+" 7 (b "*" 6 N N) (b "," 8 N N))) (b "<" 14 (b "::" 12 (b "/" 11 (b "->" 10 N N) N) (b ";" 13 N N)) (b "=" 16 (b "<=" 15 N N) (b "==" 17 N N)))) (b "in" 27 (b "and" 23 (b "[" 21 (b "@" 20 (b ">=" 19 N N) N) (b "]" 22 N N)) (b "false" 25 (b "else" 24 N N) (b "if" 26 N N))) (b "void" 32 (b "then" 30 (b "or" 29 (b "let" 28 N N) N) (b "true" 31 N N)) (b "|" 34 (b "{" 33 N N) (b "}" 35 N N))))
    where b s n = let bs = s
                  in  B bs (TS bs n)
 

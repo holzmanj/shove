@@ -99,6 +99,9 @@ instance Print Double where
 
 instance Print AbsSperg.Ident where
   prt _ (AbsSperg.Ident i) = doc $ showString $ i
+  prtList _ [] = concatD []
+  prtList _ [x] = concatD [prt 0 x, doc (showString "|")]
+  prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
 
 instance Print AbsSperg.Prog where
   prt i e = case e of
@@ -116,12 +119,16 @@ instance Print AbsSperg.Stmt where
   prtList _ (x:xs) = concatD [prt 0 x, doc (showString "\n"), prt 0 xs]
   prtList _ (x:xs) = concatD [prt 0 x, doc (showString ";"), prt 0 xs]
 
+instance Print [AbsSperg.Expr] where
+  prt = prtList
+
 instance Print AbsSperg.Expr where
   prt i e = case e of
     AbsSperg.EIdent id -> prPrec i 10 (concatD [prt 0 id])
     AbsSperg.ELit lit -> prPrec i 10 (concatD [prt 0 lit])
+    AbsSperg.EPlace -> prPrec i 10 (concatD [doc (showString "@")])
     AbsSperg.EApply expr1 expr2 -> prPrec i 9 (concatD [prt 9 expr1, prt 10 expr2])
-    AbsSperg.ETrigger expr -> prPrec i 8 (concatD [doc (showString "!"), prt 9 expr])
+    AbsSperg.EForce expr -> prPrec i 8 (concatD [doc (showString "!"), prt 9 expr])
     AbsSperg.EMul expr1 expr2 -> prPrec i 7 (concatD [prt 7 expr1, doc (showString "*"), prt 8 expr2])
     AbsSperg.EDiv expr1 expr2 -> prPrec i 7 (concatD [prt 7 expr1, doc (showString "/"), prt 8 expr2])
     AbsSperg.EMod expr1 expr2 -> prPrec i 7 (concatD [prt 7 expr1, doc (showString "%"), prt 8 expr2])
@@ -136,8 +143,12 @@ instance Print AbsSperg.Expr where
     AbsSperg.ENEqual expr1 expr2 -> prPrec i 4 (concatD [prt 5 expr1, doc (showString "!="), prt 5 expr2])
     AbsSperg.EAnd expr1 expr2 -> prPrec i 3 (concatD [prt 4 expr1, doc (showString "and"), prt 3 expr2])
     AbsSperg.EOr expr1 expr2 -> prPrec i 2 (concatD [prt 3 expr1, doc (showString "or"), prt 2 expr2])
-    AbsSperg.ESend expr1 expr2 -> prPrec i 1 (concatD [prt 1 expr1, doc (showString "->"), prt 2 expr2])
+    AbsSperg.EShove expr1 expr2 -> prPrec i 1 (concatD [prt 1 expr1, doc (showString "->"), prt 2 expr2])
     AbsSperg.EIfThen expr1 expr2 expr3 -> prPrec i 0 (concatD [doc (showString "if"), prt 0 expr1, doc (showString "then"), prt 0 expr2, doc (showString "else"), prt 0 expr3])
+    AbsSperg.ELetIn binds expr -> prPrec i 0 (concatD [doc (showString "let"), prt 0 binds, doc (showString "in"), prt 0 expr])
+  prtList _ [] = concatD []
+  prtList _ [x] = concatD [prt 0 x]
+  prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
 
 instance Print AbsSperg.Lit where
   prt i e = case e of
@@ -148,25 +159,18 @@ instance Print AbsSperg.Lit where
     AbsSperg.LTrue -> prPrec i 0 (concatD [doc (showString "true")])
     AbsSperg.LFalse -> prPrec i 0 (concatD [doc (showString "false")])
     AbsSperg.LVoid -> prPrec i 0 (concatD [doc (showString "void")])
-    AbsSperg.LList elems -> prPrec i 0 (concatD [doc (showString "["), prt 0 elems, doc (showString "]")])
-    AbsSperg.LLambda params stmts expr -> prPrec i 0 (concatD [doc (showString "{"), prt 0 params, doc (showString "|"), prt 0 stmts, prt 0 expr, doc (showString "}")])
+    AbsSperg.LList exprs -> prPrec i 0 (concatD [doc (showString "["), prt 0 exprs, doc (showString "]")])
+    AbsSperg.LLambda ids expr -> prPrec i 0 (concatD [doc (showString "{"), prt 0 ids, prt 0 expr, doc (showString "}")])
 
-instance Print [AbsSperg.Elem] where
+instance Print [AbsSperg.Ident] where
   prt = prtList
 
-instance Print AbsSperg.Elem where
-  prt i e = case e of
-    AbsSperg.Elem expr -> prPrec i 0 (concatD [prt 0 expr])
-  prtList _ [] = concatD []
-  prtList _ [x] = concatD [prt 0 x]
-  prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
-
-instance Print [AbsSperg.Param] where
+instance Print [AbsSperg.Bind] where
   prt = prtList
 
-instance Print AbsSperg.Param where
+instance Print AbsSperg.Bind where
   prt i e = case e of
-    AbsSperg.Param id -> prPrec i 0 (concatD [prt 0 id])
+    AbsSperg.Bind id expr -> prPrec i 0 (concatD [prt 0 id, doc (showString "="), prt 0 expr])
   prtList _ [] = concatD []
   prtList _ [x] = concatD [prt 0 x]
   prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]

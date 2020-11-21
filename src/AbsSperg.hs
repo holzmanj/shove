@@ -21,8 +21,9 @@ data Stmt = SBind Ident Expr
 data Expr
     = EIdent Ident
     | ELit Lit
+    | EPlace
     | EApply Expr Expr
-    | ETrigger Expr
+    | EForce Expr
     | EMul Expr Expr
     | EDiv Expr Expr
     | EMod Expr Expr
@@ -37,8 +38,9 @@ data Expr
     | ENEqual Expr Expr
     | EAnd Expr Expr
     | EOr Expr Expr
-    | ESend Expr Expr
+    | EShove Expr Expr
     | EIfThen Expr Expr Expr
+    | ELetIn [Bind] Expr
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Lit
@@ -49,13 +51,10 @@ data Lit
     | LTrue
     | LFalse
     | LVoid
-    | LList [Elem]
-    | LLambda [Param] [Stmt] Expr
+    | LList [Expr]
+    | LLambda [Ident] Expr
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
-newtype Elem = Elem Expr
-  deriving (C.Eq, C.Ord, C.Show, C.Read)
-
-newtype Param = Param Ident
+data Bind = Bind Ident Expr
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
