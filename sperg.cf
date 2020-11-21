@@ -28,6 +28,7 @@ EAnd.       Expr3   ::= Expr4 "and" Expr3 ;
 EOr.        Expr2   ::= Expr3 "or" Expr2 ;
 EShove.     Expr1   ::= Expr1 "->" Expr2 ;
 EIfThen.    Expr    ::= "if" Expr "then" Expr "else" Expr ;
+ELetIn.     Expr    ::= "let" [Bind] "in" Expr ;
 coercions Expr 11 ;
 
 LInt.       Lit     ::= Integer ;
@@ -38,8 +39,11 @@ LTrue.      Lit     ::= "true" ;
 LFalse.     Lit     ::= "false" ;
 LVoid.      Lit     ::= "void" ;
 LList.      Lit     ::= "[" [Expr] "]" ;
-LLambda.    Lit     ::= "{" [Ident] [Stmt] Expr "}" ;
+LLambda.    Lit     ::= "{" [Ident] Expr "}" ;
 
 [].         [Ident] ::= ;
 (:[]).      [Ident] ::= Ident "|" ;
 (:).        [Ident] ::= Ident "," [Ident] ;
+
+separator Bind "," ;
+Bind.       Bind    ::= Ident "=" Expr ;
