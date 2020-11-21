@@ -1,9 +1,10 @@
 comment "#" ;
 
+Program.    Prog    ::= [Stmt] ;
+
 separator Stmt "\n" ;
 separator Stmt ";" ;
 SBind.      Stmt    ::= "let" Ident "=" Expr ;
-SEval.      Stmt    ::= Expr ;
 
 EIdent.     Expr10  ::= Ident ;
 ELit.       Expr10  ::= Lit ;
@@ -25,7 +26,7 @@ EAnd.       Expr3   ::= Expr4 "and" Expr3 ;
 EOr.        Expr2   ::= Expr3 "or" Expr2 ;
 ESend.      Expr1   ::= Expr1 "->" Expr2 ;
 EIfThen.    Expr    ::= "if" Expr "then" Expr "else" Expr ;
-coercions Expr 9 ;
+coercions Expr 11 ;
 
 LInt.       Lit     ::= Integer ;
 LDouble.    Lit     ::= Double ;
@@ -35,7 +36,7 @@ LTrue.      Lit     ::= "true" ;
 LFalse.     Lit     ::= "false" ;
 LVoid.      Lit     ::= "void" ;
 LList.      Lit     ::= "[" [Elem] "]" ;
-LLambda.    Lit     ::= "{" [Param] "|" [Stmt] "}" ;
+LLambda.    Lit     ::= "{" [Param] "|" [Stmt] Expr "}" ;
 
 separator Elem "," ;
 Elem.       Elem    ::= Expr ;

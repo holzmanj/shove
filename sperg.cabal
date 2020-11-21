@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1ea06a3d9347b655d8a2885f36637f1b9e7a1d6da1bdfa3d51615aee6ce41021
+-- hash: f05a62d2833d5b8d1a1c038a3cfedf1ca2503afd20b1ee15f0506df9c7ad86cd
 
 name:           sperg
 version:        0.1.0.0
@@ -26,13 +26,20 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      AbsSperg
+      ErrM
+      LexSperg
+      ParSperg
+      PrintSperg
+      SkelSperg
+      TestSperg
   other-modules:
       Paths_sperg
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , array
   default-language: Haskell2010
 
 executable sperg-exe

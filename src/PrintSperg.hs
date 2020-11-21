@@ -100,13 +100,16 @@ instance Print Double where
 instance Print AbsSperg.Ident where
   prt _ (AbsSperg.Ident i) = doc $ showString $ i
 
+instance Print AbsSperg.Prog where
+  prt i e = case e of
+    AbsSperg.Program stmts -> prPrec i 0 (concatD [prt 0 stmts])
+
 instance Print [AbsSperg.Stmt] where
   prt = prtList
 
 instance Print AbsSperg.Stmt where
   prt i e = case e of
     AbsSperg.SBind id expr -> prPrec i 0 (concatD [doc (showString "let"), prt 0 id, doc (showString "="), prt 0 expr])
-    AbsSperg.SEval expr -> prPrec i 0 (concatD [prt 0 expr])
   prtList _ [] = concatD []
   prtList _ [] = concatD []
   prtList _ [x] = concatD [prt 0 x]
@@ -146,7 +149,7 @@ instance Print AbsSperg.Lit where
     AbsSperg.LFalse -> prPrec i 0 (concatD [doc (showString "false")])
     AbsSperg.LVoid -> prPrec i 0 (concatD [doc (showString "void")])
     AbsSperg.LList elems -> prPrec i 0 (concatD [doc (showString "["), prt 0 elems, doc (showString "]")])
-    AbsSperg.LLambda params stmts -> prPrec i 0 (concatD [doc (showString "{"), prt 0 params, doc (showString "|"), prt 0 stmts, doc (showString "}")])
+    AbsSperg.LLambda params stmts expr -> prPrec i 0 (concatD [doc (showString "{"), prt 0 params, doc (showString "|"), prt 0 stmts, prt 0 expr, doc (showString "}")])
 
 instance Print [AbsSperg.Elem] where
   prt = prtList

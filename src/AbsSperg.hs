@@ -12,7 +12,10 @@ import qualified Data.String
 newtype Ident = Ident String
   deriving (C.Eq, C.Ord, C.Show, C.Read, Data.String.IsString)
 
-data Stmt = SBind Ident Expr | SEval Expr
+data Prog = Program [Stmt]
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data Stmt = SBind Ident Expr
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Expr
@@ -47,7 +50,7 @@ data Lit
     | LFalse
     | LVoid
     | LList [Elem]
-    | LLambda [Param] [Stmt]
+    | LLambda [Param] [Stmt] Expr
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Elem = Elem Expr

@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import TestSperg (sperg)
 
 main :: IO ()
-main = someFunc
+main = sperg

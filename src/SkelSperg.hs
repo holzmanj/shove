@@ -13,10 +13,12 @@ failure x = Left $ "Undefined case: " ++ show x
 transIdent :: AbsSperg.Ident -> Result
 transIdent x = case x of
   AbsSperg.Ident string -> failure x
+transProg :: AbsSperg.Prog -> Result
+transProg x = case x of
+  AbsSperg.Program stmts -> failure x
 transStmt :: AbsSperg.Stmt -> Result
 transStmt x = case x of
   AbsSperg.SBind ident expr -> failure x
-  AbsSperg.SEval expr -> failure x
 transExpr :: AbsSperg.Expr -> Result
 transExpr x = case x of
   AbsSperg.EIdent ident -> failure x
@@ -49,7 +51,7 @@ transLit x = case x of
   AbsSperg.LFalse -> failure x
   AbsSperg.LVoid -> failure x
   AbsSperg.LList elems -> failure x
-  AbsSperg.LLambda params stmts -> failure x
+  AbsSperg.LLambda params stmts expr -> failure x
 transElem :: AbsSperg.Elem -> Result
 transElem x = case x of
   AbsSperg.Elem expr -> failure x
