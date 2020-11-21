@@ -9,6 +9,7 @@ SBind.      Stmt    ::= "let" Ident "=" Expr ;
 separator Expr "," ;
 EIdent.     Expr10  ::= Ident ;
 ELit.       Expr10  ::= Lit ;
+EPlace.     Expr10  ::= "@" ;
 EApply.     Expr9   ::= Expr9 Expr10 ;
 EForce.     Expr8   ::= "!" Expr9 ;
 EMul.       Expr7   ::= Expr7 "*" Expr8 ;
