@@ -6,10 +6,11 @@ separator Stmt "\n" ;
 separator Stmt ";" ;
 SBind.      Stmt    ::= "let" Ident "=" Expr ;
 
+separator Expr "," ;
 EIdent.     Expr10  ::= Ident ;
 ELit.       Expr10  ::= Lit ;
 EApply.     Expr9   ::= Expr9 Expr10 ;
-ETrigger.   Expr8   ::= "!" Expr9 ;
+EForce.     Expr8   ::= "!" Expr9 ;
 EMul.       Expr7   ::= Expr7 "*" Expr8 ;
 EDiv.       Expr7   ::= Expr7 "/" Expr8 ;
 EMod.       Expr7   ::= Expr7 "%" Expr8 ;
@@ -24,7 +25,7 @@ EEqual.     Expr4   ::= Expr5 "==" Expr5 ;
 ENEqual.    Expr4   ::= Expr5 "!=" Expr5 ;
 EAnd.       Expr3   ::= Expr4 "and" Expr3 ;
 EOr.        Expr2   ::= Expr3 "or" Expr2 ;
-ESend.      Expr1   ::= Expr1 "->" Expr2 ;
+EShove.     Expr1   ::= Expr1 "->" Expr2 ;
 EIfThen.    Expr    ::= "if" Expr "then" Expr "else" Expr ;
 coercions Expr 11 ;
 
@@ -35,11 +36,9 @@ LString.    Lit     ::= String ;
 LTrue.      Lit     ::= "true" ;
 LFalse.     Lit     ::= "false" ;
 LVoid.      Lit     ::= "void" ;
-LList.      Lit     ::= "[" [Elem] "]" ;
-LLambda.    Lit     ::= "{" [Param] "|" [Stmt] Expr "}" ;
+LList.      Lit     ::= "[" [Expr] "]" ;
+LLambda.    Lit     ::= "{" [Ident] [Stmt] Expr "}" ;
 
-separator Elem "," ;
-Elem.       Elem    ::= Expr ;
-
-separator Param "," ;
-Param.      Param   ::= Ident ;
+[].         [Ident] ::= ;
+(:[]).      [Ident] ::= Ident "|" ;
+(:).        [Ident] ::= Ident "," [Ident] ;
