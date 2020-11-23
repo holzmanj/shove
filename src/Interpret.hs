@@ -23,6 +23,7 @@ data Value
   | List [Value]
   | Lambda [String] Closure -- [String] is unapplied params
   | Void
+  | Defer
 
 instance Eq Value where
   (Bool   i       ) == (Bool   j       ) = i == j
@@ -56,6 +57,7 @@ instance Show Value where
   show (List   l  ) = "[" ++ intercalate "," (map show l) ++ "]"
   show (Lambda _ _) = "<function>"
   show Void         = "<void>"
+  show Defer        = "<defer>"
 
 
 showType :: Value -> String
@@ -67,6 +69,7 @@ showType (String _  ) = "String"
 showType (List   _  ) = "List"
 showType (Lambda _ _) = "Lambda"
 showType Void         = "Void"
+showType Defer        = "Defer"
 
 
 topLevelEnv :: AST.Prog -> Env
@@ -115,7 +118,7 @@ interpret (AST.ELit lit) = case lit of
     let ps' = map (\(AST.Ident s) -> s) ps
     return $ Lambda ps' (exp, env)
 
-interpret AST.EDefer             = error "Not yet implemented!"
+interpret AST.EDefer             = return Defer
 
 interpret (AST.EApply exp1 exp2) = error "Not yet implemented!"
 
