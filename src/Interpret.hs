@@ -68,7 +68,6 @@ showType (List   _  ) = "List"
 showType (Lambda _ _) = "Lambda"
 showType Void         = "Void"
 
-
 topLevelEnv :: AST.Prog -> Env
 topLevelEnv (AST.Program stmts) = Env $ fromList (map toTuple stmts)
   where toTuple (AST.SBind (AST.Ident id) expr) = (id, (expr, Env empty))
@@ -195,40 +194,56 @@ interpret (AST.ECons exp1 exp2) = do
 interpret (AST.ELess exp1 exp2) = do
   v1 <- interpret exp1
   v2 <- interpret exp2
-  case evalLess v1 v2 of
-    Left  err -> throwError err
-    Right val -> return val
- where
-  evalLess (Int    i) (Int    j) = Right $ Bool (i < j)
-  evalLess (Double i) (Double j) = Right $ Bool (i < j)
-  evalLess i j =
-    Left $ printf "Cannot compare types %s and %s." (showType i) (showType j)
+  case tryCompare v1 v2 of
+    Just ord -> return $ Bool (ord == LT)
+    Nothing  -> throwError
+      $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
 
-interpret (AST.EMore   exp1 exp2     ) = do
+interpret (AST.EMore exp1 exp2) = do
   v1 <- interpret exp1
   v2 <- interpret exp2
-  case evalMore v1 v2 of
-    Left  err -> throwError err
-    Right val -> return val
- where
-  evalMore (Int    i) (Int    j) = Right $ Bool (i > j)
-  evalMore (Double i) (Double j) = Right $ Bool (i > j)
-  evalMore i j =
-    Left $ printf "Cannot compare types %s and %s." (showType i) (showType j)
+  case tryCompare v1 v2 of
+    Just ord -> return $ Bool (ord == GT)
+    Nothing  -> throwError
+      $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
 
-interpret (AST.ELessEq exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.ELessEq exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case tryCompare v1 v2 of
+    Just ord -> return $ Bool (ord /= GT)
+    Nothing  -> throwError
+      $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
 
-interpret (AST.EMoreEq exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.EMoreEq exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case tryCompare v1 v2 of
+    Just ord -> return $ Bool (ord /= LT)
+    Nothing  -> throwError
+      $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
 
-interpret (AST.EEqual  exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.EEqual exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case tryCompare v1 v2 of
+    Just ord -> return $ Bool (ord == EQ)
+    Nothing  -> throwError
+      $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
 
-interpret (AST.ENEqual exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.ENEqual exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case tryCompare v1 v2 of
+    Just ord -> return $ Bool (ord /= EQ)
+    Nothing  -> throwError
+      $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
 
-interpret (AST.EAnd    exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.EAnd   exp1 exp2      ) = error "Not yet implemented!"
 
-interpret (AST.EOr     exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.EOr    exp1 exp2      ) = error "Not yet implemented!"
 
-interpret (AST.EShove  exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.EShove exp1 exp2      ) = error "Not yet implemented!"
 
 interpret (AST.EIfThen cond exp1 exp2) = error "Not yet implemented!"
 
