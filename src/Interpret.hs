@@ -104,4 +104,52 @@ interpret (AST.EMul exp1 exp2) = do
   evalMul i j =
     Left $ printf "Cannot multiply types %s and %s." (showType i) (showType j)
 
+interpret (AST.EDiv exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalDiv v1 v2 of
+    Left  err -> throwError err
+    Right val -> return val
+ where
+  evalDiv (Int    i) (Int    j) = Right $ Int (i `div` j)
+  evalDiv (Double i) (Double j) = Right $ Double (i / j)
+  evalDiv i j =
+    Left $ printf "Cannot divide type %s with %s." (showType i) (showType j)
+
+interpret (AST.EMod exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalMod v1 v2 of
+    Left  err -> throwError err
+    Right val -> return val
+ where
+  evalMod (Int i) (Int j) = Right $ Int (i `mod` j)
+  evalMod i j =
+    Left $ printf "Cannot mod with types %s and %s." (showType i) (showType j)
+
+interpret (AST.EAdd exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalAdd v1 v2 of
+    Left  err -> throwError err
+    Right val -> return val
+ where
+  evalAdd (Int    i) (Int    j) = Right $ Int (i + j)
+  evalAdd (Double i) (Double j) = Right $ Double (i + j)
+  evalAdd (List   i) (List   j) = Right $ List (i ++ j)
+  evalAdd i j =
+    Left $ printf "Cannot add types %s and %s." (showType i) (showType j)
+
+interpret (AST.ESub exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalSub v1 v2 of
+    Left  err -> throwError err
+    Right val -> return val
+ where
+  evalSub (Int    i) (Int    j) = Right $ Int (i - j)
+  evalSub (Double i) (Double j) = Right $ Double (i - j)
+  evalSub i j =
+    Left $ printf "Cannot subtract types %s and %s." (showType i) (showType j)
+
 interpret _ = return Void
