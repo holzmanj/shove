@@ -1929,7 +1929,7 @@ happyReduction_36 _  = notHappyAtAll
 happyReduce_37 = happySpecReduce_1  32 happyReduction_37
 happyReduction_37 _
 	 =  HappyAbsSyn32
-		 (AbsSperg.EPlace
+		 (AbsSperg.EDefer
 	)
 
 happyReduce_38 = happySpecReduce_1  32 happyReduction_38

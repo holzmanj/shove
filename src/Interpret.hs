@@ -115,7 +115,7 @@ interpret (AST.ELit lit) = case lit of
     let ps' = map (\(AST.Ident s) -> s) ps
     return $ Lambda ps' (exp, env)
 
-interpret AST.EPlace             = error "Not yet implemented!"
+interpret AST.EDefer             = error "Not yet implemented!"
 
 interpret (AST.EApply exp1 exp2) = error "Not yet implemented!"
 

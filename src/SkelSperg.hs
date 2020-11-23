@@ -23,7 +23,7 @@ transExpr :: AbsSperg.Expr -> Result
 transExpr x = case x of
   AbsSperg.EIdent ident -> failure x
   AbsSperg.ELit lit -> failure x
-  AbsSperg.EPlace -> failure x
+  AbsSperg.EDefer -> failure x
   AbsSperg.EApply expr1 expr2 -> failure x
   AbsSperg.EForce expr -> failure x
   AbsSperg.EMul expr1 expr2 -> failure x

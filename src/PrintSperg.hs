@@ -126,7 +126,7 @@ instance Print AbsSperg.Expr where
   prt i e = case e of
     AbsSperg.EIdent id -> prPrec i 10 (concatD [prt 0 id])
     AbsSperg.ELit lit -> prPrec i 10 (concatD [prt 0 lit])
-    AbsSperg.EPlace -> prPrec i 10 (concatD [doc (showString "@")])
+    AbsSperg.EDefer -> prPrec i 10 (concatD [doc (showString "@")])
     AbsSperg.EApply expr1 expr2 -> prPrec i 9 (concatD [prt 9 expr1, prt 10 expr2])
     AbsSperg.EForce expr -> prPrec i 8 (concatD [doc (showString "!"), prt 9 expr])
     AbsSperg.EMul expr1 expr2 -> prPrec i 7 (concatD [prt 7 expr1, doc (showString "*"), prt 8 expr2])

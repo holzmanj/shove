@@ -21,7 +21,7 @@ data Stmt = SBind Ident Expr
 data Expr
     = EIdent Ident
     | ELit Lit
-    | EPlace
+    | EDefer
     | EApply Expr Expr
     | EForce Expr
     | EMul Expr Expr
