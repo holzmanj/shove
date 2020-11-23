@@ -68,6 +68,7 @@ showType (List   _  ) = "List"
 showType (Lambda _ _) = "Lambda"
 showType Void         = "Void"
 
+
 topLevelEnv :: AST.Prog -> Env
 topLevelEnv (AST.Program stmts) = Env $ fromList (map toTuple stmts)
   where toTuple (AST.SBind (AST.Ident id) expr) = (id, (expr, Env empty))
