@@ -24,6 +24,29 @@ data Value
   | Lambda [String] Closure -- [String] is unapplied params
   | Void
 
+instance Eq Value where
+  (Bool   i       ) == (Bool   j       ) = i == j
+  (Int    i       ) == (Int    j       ) = i == j
+  (Double i       ) == (Double j       ) = i == j
+  (Char   i       ) == (Char   j       ) = i == j
+  (String i       ) == (String j       ) = i == j
+  (List   []      ) == (List   []      ) = True
+  (List   (x : xs)) == (List   (y : ys)) = x == y && xs == ys
+  Void              == Void              = True
+  _                 == _                 = False
+
+class MaybeOrd a where
+  tryCompare :: a -> a -> Maybe Ordering
+
+instance MaybeOrd Value where
+  tryCompare (Bool   i) (Bool   j) = Just $ compare i j
+  tryCompare (Int    i) (Int    j) = Just $ compare i j
+  tryCompare (Double i) (Double j) = Just $ compare i j
+  tryCompare (Char   i) (Char   j) = Just $ compare i j
+  tryCompare (String i) (String j) = Just $ compare i j
+  tryCompare Void       Void       = Just EQ
+  tryCompare _          _          = Nothing
+
 instance Show Value where
   show (Bool   b  ) = show b
   show (Int    i  ) = show i
