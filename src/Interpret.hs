@@ -6,6 +6,7 @@ import Control.Monad.Reader (ReaderT(runReaderT), MonadReader(ask, local))
 import Control.Monad.Except (ExceptT, MonadError(throwError), runExceptT)
 import Data.Map.Strict (Map, fromList, empty, lookup)
 import Data.List (intercalate)
+import Text.Printf (printf)
 import qualified AbsSperg as AST
 
 newtype Env = Env (Map String Closure)
@@ -32,6 +33,17 @@ instance Show Value where
   show (List   l  ) = "[" ++ intercalate "," (map show l) ++ "]"
   show (Lambda _ _) = "<function>"
   show Void         = "<void>"
+
+
+showType :: Value -> String
+showType (Bool   _  ) = "Bool"
+showType (Int    _  ) = "Int"
+showType (Double _  ) = "Double"
+showType (Char   _  ) = "Char"
+showType (String _  ) = "String"
+showType (List   _  ) = "List"
+showType (Lambda _ _) = "Lambda"
+showType Void         = "Void"
 
 
 topLevelEnv :: AST.Prog -> Env
@@ -79,5 +91,17 @@ interpret (AST.ELit lit) = case lit of
     env <- lift ask
     let ps' = map (\(AST.Ident s) -> s) ps
     return $ Lambda ps' (exp, env)
+
+interpret (AST.EMul exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalMul v1 v2 of
+    Left  err -> throwError err
+    Right val -> return val
+ where
+  evalMul (Int    i) (Int    j) = Right $ Int (i * j)
+  evalMul (Double i) (Double j) = Right $ Double (i * j)
+  evalMul i j =
+    Left $ printf "Cannot multiply types %s and %s." (showType i) (showType j)
 
 interpret _ = return Void
