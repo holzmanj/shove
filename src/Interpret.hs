@@ -92,7 +92,13 @@ interpret (AST.ELit lit) = case lit of
     let ps' = map (\(AST.Ident s) -> s) ps
     return $ Lambda ps' (exp, env)
 
-interpret (AST.EMul exp1 exp2) = do
+interpret AST.EPlace             = error "Not yet implemented!"
+
+interpret (AST.EApply exp1 exp2) = error "Not yet implemented!"
+
+interpret (AST.EForce exp      ) = error "Not yet implemented!"
+
+interpret (AST.EMul exp1 exp2  ) = do
   v1 <- interpret exp1
   v2 <- interpret exp2
   case evalMul v1 v2 of
@@ -152,4 +158,26 @@ interpret (AST.ESub exp1 exp2) = do
   evalSub i j =
     Left $ printf "Cannot subtract types %s and %s." (showType i) (showType j)
 
-interpret _ = return Void
+interpret (AST.ECons   exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.ELess   exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.EMore   exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.ELessEq exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.EMoreEq exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.EEqual  exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.ENEqual exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.EAnd    exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.EOr     exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.EShove  exp1 exp2     ) = error "Not yet implemented!"
+
+interpret (AST.EIfThen cond exp1 exp2) = error "Not yet implemented!"
+
+interpret (AST.ELetIn binds exp      ) = error "Not yet implemented!"
