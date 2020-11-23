@@ -239,9 +239,27 @@ interpret (AST.ENEqual exp1 exp2) = do
     Nothing  -> throwError
       $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
 
-interpret (AST.EAnd   exp1 exp2      ) = error "Not yet implemented!"
+interpret (AST.EAnd exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalAnd v1 v2 of
+    Just b  -> return $ Bool b
+    Nothing -> throwError
+      $ printf "Cannot AND types %s and %s." (showType v1) (showType v2)
+ where
+  evalAnd (Bool i) (Bool j) = Just (i && j)
+  evalAnd _        _        = Nothing
 
-interpret (AST.EOr    exp1 exp2      ) = error "Not yet implemented!"
+interpret (AST.EOr exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalOr v1 v2 of
+    Just b  -> return $ Bool b
+    Nothing -> throwError
+      $ printf "Cannot OR types %s and %s." (showType v1) (showType v2)
+ where
+  evalOr (Bool i) (Bool j) = Just (i || j)
+  evalOr _        _        = Nothing
 
 interpret (AST.EShove exp1 exp2      ) = error "Not yet implemented!"
 
