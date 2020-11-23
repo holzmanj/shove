@@ -181,7 +181,17 @@ interpret (AST.ELess exp1 exp2) = do
   evalLess i j =
     Left $ printf "Cannot compare types %s and %s." (showType i) (showType j)
 
-interpret (AST.EMore   exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.EMore   exp1 exp2     ) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalMore v1 v2 of
+    Left  err -> throwError err
+    Right val -> return val
+ where
+  evalMore (Int    i) (Int    j) = Right $ Bool (i > j)
+  evalMore (Double i) (Double j) = Right $ Bool (i > j)
+  evalMore i j =
+    Left $ printf "Cannot compare types %s and %s." (showType i) (showType j)
 
 interpret (AST.ELessEq exp1 exp2     ) = error "Not yet implemented!"
 
