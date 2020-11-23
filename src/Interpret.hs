@@ -2,8 +2,8 @@ module Interpret where
 
 import Prelude hiding (lookup)
 import Control.Monad.Trans (MonadTrans(lift))
-import Control.Monad.Reader (ReaderT(runReaderT), MonadReader(ask))
-import Control.Monad.Except (ExceptT, runExceptT)
+import Control.Monad.Reader (ReaderT(runReaderT), MonadReader(ask, local))
+import Control.Monad.Except (ExceptT, MonadError(throwError), runExceptT)
 import Data.Map.Strict (Map, fromList, empty, lookup)
 import Data.List (intercalate)
 import qualified AbsSperg as AST
@@ -51,11 +51,18 @@ runInterpreter prog = do
   let main = entrypoint env
   res <- runReaderT (runExceptT (interpret main)) env
   case res of
-    Left  err -> putStrLn $ "Error: " ++ err
+    Left  err -> putStrLn $ "Runtime Error: " ++ err
     Right val -> print val
 
 
 interpret :: AST.Expr -> Interp Value
+
+interpret (AST.EIdent id) = do
+  let (AST.Ident name) = id
+  (Env env) <- lift ask
+  case lookup name env of
+    Nothing           -> throwError $ "Unbound identifier \"" ++ name ++ "\""
+    Just (nexp, nenv) -> local (const nenv) $ interpret nexp
 
 interpret (AST.ELit lit) = case lit of
   AST.LInt    i -> return $ Int i
