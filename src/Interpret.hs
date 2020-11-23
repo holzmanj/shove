@@ -158,9 +158,28 @@ interpret (AST.ESub exp1 exp2) = do
   evalSub i j =
     Left $ printf "Cannot subtract types %s and %s." (showType i) (showType j)
 
-interpret (AST.ECons   exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.ECons exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalCons v1 v2 of
+    Left  err -> throwError err
+    Right val -> return val
+ where
+  evalCons i (List l) = Right $ List (i : l)
+  evalCons i j =
+    Left $ printf "Cannot cons types %s and %s." (showType i) (showType j)
 
-interpret (AST.ELess   exp1 exp2     ) = error "Not yet implemented!"
+interpret (AST.ELess exp1 exp2) = do
+  v1 <- interpret exp1
+  v2 <- interpret exp2
+  case evalLess v1 v2 of
+    Left  err -> throwError err
+    Right val -> return val
+ where
+  evalLess (Int    i) (Int    j) = Right $ Bool (i < j)
+  evalLess (Double i) (Double j) = Right $ Bool (i < j)
+  evalLess i j =
+    Left $ printf "Cannot compare types %s and %s." (showType i) (showType j)
 
 interpret (AST.EMore   exp1 exp2     ) = error "Not yet implemented!"
 
