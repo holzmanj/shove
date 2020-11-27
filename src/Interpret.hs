@@ -4,7 +4,7 @@ import Prelude hiding (lookup)
 import Control.Monad.Trans (MonadTrans(lift))
 import Control.Monad.Reader (ReaderT(runReaderT), MonadReader(ask))
 import Control.Monad.Except (ExceptT, MonadError(throwError), runExceptT)
-import Data.Map.Strict (Map, empty, lookup)
+import Data.Map.Strict (Map, empty, insert, lookup)
 import Data.List (intercalate)
 import Text.Printf (printf)
 import qualified AbsSperg as AST
@@ -144,11 +144,23 @@ interpret (AST.ELit lit) = case lit of
 
 interpret AST.EDefer             = return Defer
 
-interpret (AST.EApply exp1 exp2) = error "Not yet implemented!"
+interpret (AST.EApply exp1 exp2) = do
+  f <- interpret exp1
+  x <- interpret exp2
+  apply f x
+ where
+  apply :: Value -> Value -> Interp Value
+  apply (Lambda [] _) _ = throwError "Too many arguments for lambda."
+  apply (Lambda (p : ps) c) Defer = return $ Lambda (ps ++ [p]) c
+  apply (Lambda (p : ps) (bod, env)) v = do
+    let env' = insert p v env
+    return $ Lambda ps (bod, env')
+  apply val _ = throwError $ "Cannot apply arguments to type " ++ showType val
 
-interpret (AST.EForce exp      ) = error "Not yet implemented!"
 
-interpret (AST.EMul exp1 exp2  ) = do
+interpret (AST.EForce exp    ) = error "Not yet implemented!"
+
+interpret (AST.EMul exp1 exp2) = do
   v1 <- interpret exp1
   v2 <- interpret exp2
   case evalMul v1 v2 of
