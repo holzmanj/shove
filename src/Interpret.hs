@@ -2,17 +2,17 @@ module Interpret where
 
 import Prelude hiding (lookup)
 import Control.Monad.Trans (MonadTrans(lift))
-import Control.Monad.Reader (ReaderT(runReaderT), MonadReader(ask, local))
+import Control.Monad.Reader (ReaderT(runReaderT), MonadReader(ask))
 import Control.Monad.Except (ExceptT, MonadError(throwError), runExceptT)
-import Data.Map.Strict (Map, fromList, empty, lookup)
+import Data.Map.Strict (Map, empty, lookup)
 import Data.List (intercalate)
 import Text.Printf (printf)
 import qualified AbsSperg as AST
 
-newtype Env = Env (Map String Closure)
-type Closure = (AST.Expr, Env)
+type Store = Map String Value
+type Closure = (AST.Expr, Store)
 
-type Interp a = ExceptT String (ReaderT Env IO) a
+type Interp a = ExceptT String (ReaderT [Store] IO) a
 
 data Value
   = Bool Bool
@@ -72,35 +72,60 @@ showType Void         = "Void"
 showType Defer        = "Defer"
 
 
-topLevelEnv :: AST.Prog -> Env
-topLevelEnv (AST.Program stmts) = Env $ fromList (map toTuple stmts)
-  where toTuple (AST.SBind (AST.Ident id) expr) = (id, (expr, Env empty))
+{-|
+Returns the smallest substack of 'Store's that contains the definition of 'id'.
+Intended to find the common scope-level between a function body and another
+function being called from that body.
+-}
+scopeFor :: String -> [Store] -> [Store]
+scopeFor _  []       = []
+scopeFor id (e : es) = case lookup id e of
+  Just _  -> e : es
+  Nothing -> scopeFor id es
 
 
-entrypoint :: Env -> AST.Expr
-entrypoint (Env env) = case lookup "main" env of
-  Nothing       -> AST.ELit AST.LVoid   -- if no main function, just do nop
-  Just (exp, _) -> exp
+{-|
+Transforms a `Prog` (aka a list of bind statements) into single expression that
+can be evaluated through `interpret`.
+Specifially, the expression produced will be a 'let x in y' where 'x' is the
+list of bindings and 'y' is a call to the 'main' function (if it exists).
+-}
+progToExpr :: AST.Prog -> AST.Expr
+progToExpr (AST.Program stmts) =
+  let
+    toExpBind (AST.SBind id exp) = AST.Bind id exp
+    hasMain = any (\(AST.SBind id _) -> id == AST.Ident "main") stmts
+    body    = if hasMain
+      then AST.EForce (AST.EIdent $ AST.Ident "main")
+      -- just do nop if no main was defined.
+      else AST.ELit AST.LVoid
+  in AST.ELetIn (map toExpBind stmts) body
 
 
 runInterpreter :: AST.Prog -> IO ()
 runInterpreter prog = do
-  let env  = topLevelEnv prog
-  let main = entrypoint env
-  res <- runReaderT (runExceptT (interpret main)) env
+  let expr = progToExpr prog
+  res <- runReaderT (runExceptT (interpret expr)) []
   case res of
     Left  err -> putStrLn $ "Runtime Error: " ++ err
     Right val -> print val
+
+
+lookupInStack :: String -> [Store] -> Maybe Value
+lookupInStack _  []       = Nothing
+lookupInStack id (s : ss) = case lookup id s of
+  Just v  -> Just v
+  Nothing -> lookupInStack id ss
 
 
 interpret :: AST.Expr -> Interp Value
 
 interpret (AST.EIdent id) = do
   let (AST.Ident name) = id
-  (Env env) <- lift ask
-  case lookup name env of
-    Nothing           -> throwError $ "Unbound identifier \"" ++ name ++ "\""
-    Just (nexp, nenv) -> local (const nenv) $ interpret nexp
+  env <- lift ask
+  case lookupInStack name env of
+    Nothing  -> throwError $ "Unbound identifier \"" ++ name ++ "\""
+    Just val -> return val
 
 interpret (AST.ELit lit) = case lit of
   AST.LInt    i -> return $ Int i
@@ -114,9 +139,8 @@ interpret (AST.ELit lit) = case lit of
     l' <- mapM interpret l
     return $ List l'
   AST.LLambda ps exp -> do
-    env <- lift ask
     let ps' = map (\(AST.Ident s) -> s) ps
-    return $ Lambda ps' (exp, env)
+    return $ Lambda ps' (exp, empty)
 
 interpret AST.EDefer             = return Defer
 
