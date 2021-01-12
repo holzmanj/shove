@@ -320,4 +320,10 @@ interpret (AST.EIfThen cond exp1 exp2) = do
     Bool False -> interpret exp2
     _ -> throwError $ "Expected boolean condition, but got: " ++ showType res
 
-interpret (AST.ELetIn binds exp) = error "Not yet implemented!"
+interpret (AST.ELetIn []       exp) = interpret exp
+interpret (AST.ELetIn (b : bs) exp) = do
+  let (AST.Bind (AST.Ident id) ex) = b
+  val      <- interpret ex
+  (e : es) <- lift ask
+  let e' = insert id val e'
+  local (const (e' : es)) $ interpret (AST.ELetIn bs exp)
