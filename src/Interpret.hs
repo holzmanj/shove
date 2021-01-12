@@ -310,7 +310,8 @@ interpret (AST.EOr exp1 exp2) = do
   evalOr (Bool i) (Bool j) = Just (i || j)
   evalOr _        _        = Nothing
 
-interpret (AST.EShove exp1 exp2      ) = error "Not yet implemented!"
+interpret (AST.EShove exp1 exp2) =
+  interpret (AST.EForce (AST.EApply exp2 exp1))
 
 interpret (AST.EIfThen cond exp1 exp2) = error "Not yet implemented!"
 
