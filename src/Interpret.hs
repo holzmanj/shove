@@ -2,7 +2,7 @@ module Interpret where
 
 import Prelude hiding (lookup)
 import Control.Monad.Trans (MonadTrans(lift))
-import Control.Monad.Reader (ReaderT(runReaderT), MonadReader(ask))
+import Control.Monad.Reader (ReaderT(runReaderT), MonadReader(local, ask))
 import Control.Monad.Except (ExceptT, MonadError(throwError), runExceptT)
 import Data.Map.Strict (Map, empty, insert, lookup)
 import Data.List (intercalate)
@@ -10,7 +10,7 @@ import Text.Printf (printf)
 import qualified AbsSperg as AST
 
 type Store = Map String Value
-type Closure = (AST.Expr, Store)
+type Closure = (AST.Expr, [Store])
 
 type Interp a = ExceptT String (ReaderT [Store] IO) a
 
@@ -140,7 +140,8 @@ interpret (AST.ELit lit) = case lit of
     return $ List l'
   AST.LLambda ps exp -> do
     let ps' = map (\(AST.Ident s) -> s) ps
-    return $ Lambda ps' (exp, empty)
+    env <- lift ask
+    return $ Lambda ps' (exp, empty : env)
 
 interpret AST.EDefer             = return Defer
 
@@ -152,13 +153,21 @@ interpret (AST.EApply exp1 exp2) = do
   apply :: Value -> Value -> Interp Value
   apply (Lambda [] _) _ = throwError "Too many arguments for lambda."
   apply (Lambda (p : ps) c) Defer = return $ Lambda (ps ++ [p]) c
-  apply (Lambda (p : ps) (bod, env)) v = do
-    let env' = insert p v env
-    return $ Lambda ps (bod, env')
+  apply (Lambda (p : ps) (bod, e : es)) v = do
+    let e' = insert p v e
+    return $ Lambda ps (bod, e' : es)
   apply val _ = throwError $ "Cannot apply arguments to type " ++ showType val
 
-
-interpret (AST.EForce exp    ) = error "Not yet implemented!"
+interpret (AST.EForce exp) = do
+  v <- interpret exp
+  force v
+ where
+  force :: Value -> Interp Value
+  force (Lambda [] (bod, env)) = local (const env) $ interpret bod
+  force (Lambda _ _) =  -- nonempty params list
+    throwError "Cannot force a lambda with unbound parameters."
+  -- forcing a value that isn't a lambda simply returns the same value
+  force x = return x
 
 interpret (AST.EMul exp1 exp2) = do
   v1 <- interpret exp1
