@@ -313,6 +313,11 @@ interpret (AST.EOr exp1 exp2) = do
 interpret (AST.EShove exp1 exp2) =
   interpret (AST.EForce (AST.EApply exp2 exp1))
 
-interpret (AST.EIfThen cond exp1 exp2) = error "Not yet implemented!"
+interpret (AST.EIfThen cond exp1 exp2) = do
+  res <- interpret cond
+  case res of
+    Bool True -> interpret exp1
+    Bool False -> interpret exp2
+    _ -> throwError $ "Expected boolean condition, but got: " ++ showType res
 
-interpret (AST.ELetIn binds exp      ) = error "Not yet implemented!"
+interpret (AST.ELetIn binds exp) = error "Not yet implemented!"
