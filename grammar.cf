@@ -5,6 +5,7 @@ Program.    Prog    ::= [Stmt] ;
 separator Stmt "\n" ;
 separator Stmt ";" ;
 SBind.      Stmt    ::= "let" Ident "=" Expr ;
+SEval.      Stmt    ::= Expr ;
 
 separator Expr "," ;
 EIdent.     Expr10  ::= Ident ;

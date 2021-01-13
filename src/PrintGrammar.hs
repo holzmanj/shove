@@ -113,6 +113,7 @@ instance Print [AbsGrammar.Stmt] where
 instance Print AbsGrammar.Stmt where
   prt i e = case e of
     AbsGrammar.SBind id expr -> prPrec i 0 (concatD [doc (showString "let"), prt 0 id, doc (showString "="), prt 0 expr])
+    AbsGrammar.SEval expr -> prPrec i 0 (concatD [prt 0 expr])
   prtList _ [] = concatD []
   prtList _ [] = concatD []
   prtList _ [x] = concatD [prt 0 x]

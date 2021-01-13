@@ -19,6 +19,7 @@ transProg x = case x of
 transStmt :: AbsGrammar.Stmt -> Result
 transStmt x = case x of
   AbsGrammar.SBind ident expr -> failure x
+  AbsGrammar.SEval expr -> failure x
 transExpr :: AbsGrammar.Expr -> Result
 transExpr x = case x of
   AbsGrammar.EIdent ident -> failure x

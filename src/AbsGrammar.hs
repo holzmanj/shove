@@ -15,7 +15,7 @@ newtype Ident = Ident String
 data Prog = Program [Stmt]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
-data Stmt = SBind Ident Expr
+data Stmt = SBind Ident Expr | SEval Expr
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Expr
