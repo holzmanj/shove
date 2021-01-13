@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -fno-warn-unused-binds -fno-warn-missing-signatures #-}
 {-# LANGUAGE CPP #-}
-{-# LINE 3 "LexSperg.x" #-}
+{-# LINE 3 "LexGrammar.x" #-}
 
 {-# OPTIONS -fno-warn-incomplete-patterns #-}
 {-# OPTIONS_GHC -w #-}
-module LexSperg where
+module LexGrammar where
 
 import qualified Data.Bits
 import Data.Word (Word8)
@@ -6184,7 +6184,7 @@ alex_actions = array (0 :: Int, 9)
   , (0,alex_action_7)
   ]
 
-{-# LINE 41 "LexSperg.x" #-}
+{-# LINE 41 "LexGrammar.x" #-}
 
 
 tok :: (Posn -> String -> Token) -> (Posn -> String -> Token)

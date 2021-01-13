@@ -3,7 +3,7 @@
 
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module AbsSperg where
+module AbsGrammar where
 
 import Prelude (Char, Double, Integer, String)
 import qualified Prelude as C (Eq, Ord, Show, Read)
@@ -12,7 +12,7 @@ import qualified Data.String
 newtype Ident = Ident String
   deriving (C.Eq, C.Ord, C.Show, C.Read, Data.String.IsString)
 
-newtype Prog = Program [Stmt]
+data Prog = Program [Stmt]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Stmt = SBind Ident Expr

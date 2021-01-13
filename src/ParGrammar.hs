@@ -1,8 +1,8 @@
 {-# OPTIONS_GHC -w #-}
 {-# OPTIONS_GHC -fno-warn-incomplete-patterns -fno-warn-overlapping-patterns #-}
-module ParSperg where
-import qualified AbsSperg
-import LexSperg
+module ParGrammar where
+import qualified AbsGrammar
+import LexGrammar
 import qualified Data.Array as Happy_Data_Array
 import qualified Data.Bits as Bits
 import Control.Applicative(Applicative(..))
@@ -13,20 +13,20 @@ import Control.Monad (ap)
 data HappyAbsSyn 
 	= HappyTerminal (Token)
 	| HappyErrorToken Int
-	| HappyAbsSyn23 (AbsSperg.Ident)
+	| HappyAbsSyn23 (AbsGrammar.Ident)
 	| HappyAbsSyn24 (Integer)
 	| HappyAbsSyn25 (Double)
 	| HappyAbsSyn26 (Char)
 	| HappyAbsSyn27 (String)
-	| HappyAbsSyn28 (AbsSperg.Prog)
-	| HappyAbsSyn29 ([AbsSperg.Stmt])
-	| HappyAbsSyn30 (AbsSperg.Stmt)
-	| HappyAbsSyn31 ([AbsSperg.Expr])
-	| HappyAbsSyn32 (AbsSperg.Expr)
-	| HappyAbsSyn44 (AbsSperg.Lit)
-	| HappyAbsSyn45 ([AbsSperg.Ident])
-	| HappyAbsSyn46 ([AbsSperg.Bind])
-	| HappyAbsSyn47 (AbsSperg.Bind)
+	| HappyAbsSyn28 (AbsGrammar.Prog)
+	| HappyAbsSyn29 ([AbsGrammar.Stmt])
+	| HappyAbsSyn30 (AbsGrammar.Stmt)
+	| HappyAbsSyn31 ([AbsGrammar.Expr])
+	| HappyAbsSyn32 (AbsGrammar.Expr)
+	| HappyAbsSyn44 (AbsGrammar.Lit)
+	| HappyAbsSyn45 ([AbsGrammar.Ident])
+	| HappyAbsSyn46 ([AbsGrammar.Bind])
+	| HappyAbsSyn47 (AbsGrammar.Bind)
 
 {- to allow type-synonyms as our monads (likely
  - with explicitly-specified bind and return)
@@ -1808,7 +1808,7 @@ action_141 _ = happyReduce_65
 happyReduce_20 = happySpecReduce_1  23 happyReduction_20
 happyReduction_20 (HappyTerminal (PT _ (TV happy_var_1)))
 	 =  HappyAbsSyn23
-		 (AbsSperg.Ident happy_var_1
+		 (AbsGrammar.Ident happy_var_1
 	)
 happyReduction_20 _  = notHappyAtAll 
 
@@ -1843,7 +1843,7 @@ happyReduction_24 _  = notHappyAtAll
 happyReduce_25 = happySpecReduce_1  28 happyReduction_25
 happyReduction_25 (HappyAbsSyn29  happy_var_1)
 	 =  HappyAbsSyn28
-		 (AbsSperg.Program happy_var_1
+		 (AbsGrammar.Program happy_var_1
 	)
 happyReduction_25 _  = notHappyAtAll 
 
@@ -1888,7 +1888,7 @@ happyReduction_31 ((HappyAbsSyn32  happy_var_4) `HappyStk`
 	_ `HappyStk`
 	happyRest)
 	 = HappyAbsSyn30
-		 (AbsSperg.SBind happy_var_2 happy_var_4
+		 (AbsGrammar.SBind happy_var_2 happy_var_4
 	) `HappyStk` happyRest
 
 happyReduce_32 = happySpecReduce_0  31 happyReduction_32
@@ -1915,21 +1915,21 @@ happyReduction_34 _ _ _  = notHappyAtAll
 happyReduce_35 = happySpecReduce_1  32 happyReduction_35
 happyReduction_35 (HappyAbsSyn23  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EIdent happy_var_1
+		 (AbsGrammar.EIdent happy_var_1
 	)
 happyReduction_35 _  = notHappyAtAll 
 
 happyReduce_36 = happySpecReduce_1  32 happyReduction_36
 happyReduction_36 (HappyAbsSyn44  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.ELit happy_var_1
+		 (AbsGrammar.ELit happy_var_1
 	)
 happyReduction_36 _  = notHappyAtAll 
 
 happyReduce_37 = happySpecReduce_1  32 happyReduction_37
 happyReduction_37 _
 	 =  HappyAbsSyn32
-		 (AbsSperg.EDefer
+		 (AbsGrammar.EDefer
 	)
 
 happyReduce_38 = happySpecReduce_1  32 happyReduction_38
@@ -1943,7 +1943,7 @@ happyReduce_39 = happySpecReduce_2  33 happyReduction_39
 happyReduction_39 (HappyAbsSyn32  happy_var_2)
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EApply happy_var_1 happy_var_2
+		 (AbsGrammar.EApply happy_var_1 happy_var_2
 	)
 happyReduction_39 _ _  = notHappyAtAll 
 
@@ -1958,7 +1958,7 @@ happyReduce_41 = happySpecReduce_2  34 happyReduction_41
 happyReduction_41 (HappyAbsSyn32  happy_var_2)
 	_
 	 =  HappyAbsSyn32
-		 (AbsSperg.EForce happy_var_2
+		 (AbsGrammar.EForce happy_var_2
 	)
 happyReduction_41 _ _  = notHappyAtAll 
 
@@ -1974,7 +1974,7 @@ happyReduction_43 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EMul happy_var_1 happy_var_3
+		 (AbsGrammar.EMul happy_var_1 happy_var_3
 	)
 happyReduction_43 _ _ _  = notHappyAtAll 
 
@@ -1983,7 +1983,7 @@ happyReduction_44 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EDiv happy_var_1 happy_var_3
+		 (AbsGrammar.EDiv happy_var_1 happy_var_3
 	)
 happyReduction_44 _ _ _  = notHappyAtAll 
 
@@ -1992,7 +1992,7 @@ happyReduction_45 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EMod happy_var_1 happy_var_3
+		 (AbsGrammar.EMod happy_var_1 happy_var_3
 	)
 happyReduction_45 _ _ _  = notHappyAtAll 
 
@@ -2008,7 +2008,7 @@ happyReduction_47 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EAdd happy_var_1 happy_var_3
+		 (AbsGrammar.EAdd happy_var_1 happy_var_3
 	)
 happyReduction_47 _ _ _  = notHappyAtAll 
 
@@ -2017,7 +2017,7 @@ happyReduction_48 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.ESub happy_var_1 happy_var_3
+		 (AbsGrammar.ESub happy_var_1 happy_var_3
 	)
 happyReduction_48 _ _ _  = notHappyAtAll 
 
@@ -2033,7 +2033,7 @@ happyReduction_50 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.ECons happy_var_1 happy_var_3
+		 (AbsGrammar.ECons happy_var_1 happy_var_3
 	)
 happyReduction_50 _ _ _  = notHappyAtAll 
 
@@ -2049,7 +2049,7 @@ happyReduction_52 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.ELess happy_var_1 happy_var_3
+		 (AbsGrammar.ELess happy_var_1 happy_var_3
 	)
 happyReduction_52 _ _ _  = notHappyAtAll 
 
@@ -2058,7 +2058,7 @@ happyReduction_53 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EMore happy_var_1 happy_var_3
+		 (AbsGrammar.EMore happy_var_1 happy_var_3
 	)
 happyReduction_53 _ _ _  = notHappyAtAll 
 
@@ -2067,7 +2067,7 @@ happyReduction_54 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.ELessEq happy_var_1 happy_var_3
+		 (AbsGrammar.ELessEq happy_var_1 happy_var_3
 	)
 happyReduction_54 _ _ _  = notHappyAtAll 
 
@@ -2076,7 +2076,7 @@ happyReduction_55 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EMoreEq happy_var_1 happy_var_3
+		 (AbsGrammar.EMoreEq happy_var_1 happy_var_3
 	)
 happyReduction_55 _ _ _  = notHappyAtAll 
 
@@ -2085,7 +2085,7 @@ happyReduction_56 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EEqual happy_var_1 happy_var_3
+		 (AbsGrammar.EEqual happy_var_1 happy_var_3
 	)
 happyReduction_56 _ _ _  = notHappyAtAll 
 
@@ -2094,7 +2094,7 @@ happyReduction_57 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.ENEqual happy_var_1 happy_var_3
+		 (AbsGrammar.ENEqual happy_var_1 happy_var_3
 	)
 happyReduction_57 _ _ _  = notHappyAtAll 
 
@@ -2110,7 +2110,7 @@ happyReduction_59 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EAnd happy_var_1 happy_var_3
+		 (AbsGrammar.EAnd happy_var_1 happy_var_3
 	)
 happyReduction_59 _ _ _  = notHappyAtAll 
 
@@ -2126,7 +2126,7 @@ happyReduction_61 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EOr happy_var_1 happy_var_3
+		 (AbsGrammar.EOr happy_var_1 happy_var_3
 	)
 happyReduction_61 _ _ _  = notHappyAtAll 
 
@@ -2142,7 +2142,7 @@ happyReduction_63 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn32  happy_var_1)
 	 =  HappyAbsSyn32
-		 (AbsSperg.EShove happy_var_1 happy_var_3
+		 (AbsGrammar.EShove happy_var_1 happy_var_3
 	)
 happyReduction_63 _ _ _  = notHappyAtAll 
 
@@ -2162,7 +2162,7 @@ happyReduction_65 ((HappyAbsSyn32  happy_var_6) `HappyStk`
 	_ `HappyStk`
 	happyRest)
 	 = HappyAbsSyn32
-		 (AbsSperg.EIfThen happy_var_2 happy_var_4 happy_var_6
+		 (AbsGrammar.EIfThen happy_var_2 happy_var_4 happy_var_6
 	) `HappyStk` happyRest
 
 happyReduce_66 = happyReduce 4 42 happyReduction_66
@@ -2172,7 +2172,7 @@ happyReduction_66 ((HappyAbsSyn32  happy_var_4) `HappyStk`
 	_ `HappyStk`
 	happyRest)
 	 = HappyAbsSyn32
-		 (AbsSperg.ELetIn happy_var_2 happy_var_4
+		 (AbsGrammar.ELetIn happy_var_2 happy_var_4
 	) `HappyStk` happyRest
 
 happyReduce_67 = happySpecReduce_1  42 happyReduction_67
@@ -2194,47 +2194,47 @@ happyReduction_68 _ _ _  = notHappyAtAll
 happyReduce_69 = happySpecReduce_1  44 happyReduction_69
 happyReduction_69 (HappyAbsSyn24  happy_var_1)
 	 =  HappyAbsSyn44
-		 (AbsSperg.LInt happy_var_1
+		 (AbsGrammar.LInt happy_var_1
 	)
 happyReduction_69 _  = notHappyAtAll 
 
 happyReduce_70 = happySpecReduce_1  44 happyReduction_70
 happyReduction_70 (HappyAbsSyn25  happy_var_1)
 	 =  HappyAbsSyn44
-		 (AbsSperg.LDouble happy_var_1
+		 (AbsGrammar.LDouble happy_var_1
 	)
 happyReduction_70 _  = notHappyAtAll 
 
 happyReduce_71 = happySpecReduce_1  44 happyReduction_71
 happyReduction_71 (HappyAbsSyn26  happy_var_1)
 	 =  HappyAbsSyn44
-		 (AbsSperg.LChar happy_var_1
+		 (AbsGrammar.LChar happy_var_1
 	)
 happyReduction_71 _  = notHappyAtAll 
 
 happyReduce_72 = happySpecReduce_1  44 happyReduction_72
 happyReduction_72 (HappyAbsSyn27  happy_var_1)
 	 =  HappyAbsSyn44
-		 (AbsSperg.LString happy_var_1
+		 (AbsGrammar.LString happy_var_1
 	)
 happyReduction_72 _  = notHappyAtAll 
 
 happyReduce_73 = happySpecReduce_1  44 happyReduction_73
 happyReduction_73 _
 	 =  HappyAbsSyn44
-		 (AbsSperg.LTrue
+		 (AbsGrammar.LTrue
 	)
 
 happyReduce_74 = happySpecReduce_1  44 happyReduction_74
 happyReduction_74 _
 	 =  HappyAbsSyn44
-		 (AbsSperg.LFalse
+		 (AbsGrammar.LFalse
 	)
 
 happyReduce_75 = happySpecReduce_1  44 happyReduction_75
 happyReduction_75 _
 	 =  HappyAbsSyn44
-		 (AbsSperg.LVoid
+		 (AbsGrammar.LVoid
 	)
 
 happyReduce_76 = happySpecReduce_3  44 happyReduction_76
@@ -2242,7 +2242,7 @@ happyReduction_76 _
 	(HappyAbsSyn31  happy_var_2)
 	_
 	 =  HappyAbsSyn44
-		 (AbsSperg.LList happy_var_2
+		 (AbsGrammar.LList happy_var_2
 	)
 happyReduction_76 _ _ _  = notHappyAtAll 
 
@@ -2253,7 +2253,7 @@ happyReduction_77 (_ `HappyStk`
 	_ `HappyStk`
 	happyRest)
 	 = HappyAbsSyn44
-		 (AbsSperg.LLambda happy_var_2 happy_var_3
+		 (AbsGrammar.LLambda happy_var_2 happy_var_3
 	) `HappyStk` happyRest
 
 happyReduce_78 = happySpecReduce_0  45 happyReduction_78
@@ -2304,7 +2304,7 @@ happyReduction_84 (HappyAbsSyn32  happy_var_3)
 	_
 	(HappyAbsSyn23  happy_var_1)
 	 =  HappyAbsSyn47
-		 (AbsSperg.Bind happy_var_1 happy_var_3
+		 (AbsGrammar.Bind happy_var_1 happy_var_3
 	)
 happyReduction_84 _ _ _  = notHappyAtAll 
 

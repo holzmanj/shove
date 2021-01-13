@@ -7,7 +7,7 @@ import Control.Monad.Except (ExceptT, MonadError(throwError), runExceptT)
 import Data.Map.Strict (Map, empty, insert, lookup)
 import Data.List (intercalate)
 import Text.Printf (printf)
-import qualified AbsSperg as AST
+import qualified AbsGrammar as AST
 
 type Store = Map String Value
 type Closure = (AST.Expr, [Store])
