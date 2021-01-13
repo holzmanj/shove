@@ -10,9 +10,9 @@ import Text.Printf (printf)
 import qualified AbsGrammar as AST
 
 type Store = Map String Value
-type Closure = (AST.Expr, [Store])
+type Closure = (AST.Expr, Store)
 
-type Interp a = ExceptT String (ReaderT [Store] IO) a
+type Interp a = ExceptT String (ReaderT Store IO) a
 
 data Value
   = Bool Bool
@@ -73,18 +73,6 @@ showType Defer        = "Defer"
 
 
 {-|
-Returns the smallest substack of 'Store's that contains the definition of 'id'.
-Intended to find the common scope-level between a function body and another
-function being called from that body.
--}
-scopeFor :: String -> [Store] -> [Store]
-scopeFor _  []       = []
-scopeFor id (e : es) = case lookup id e of
-  Just _  -> e : es
-  Nothing -> scopeFor id es
-
-
-{-|
 Transforms a `Prog` (aka a list of bind statements) into single expression that
 can be evaluated through `interpret`.
 Specifially, the expression produced will be a 'let x in y' where 'x' is the
@@ -105,17 +93,10 @@ progToExpr (AST.Program stmts) =
 runInterpreter :: AST.Prog -> IO ()
 runInterpreter prog = do
   let expr = progToExpr prog
-  res <- runReaderT (runExceptT (interpret expr)) []
+  res <- runReaderT (runExceptT (interpret expr)) empty
   case res of
     Left  err -> putStrLn $ "Runtime Error: " ++ err
     Right val -> print val
-
-
-lookupInStack :: String -> [Store] -> Maybe Value
-lookupInStack _  []       = Nothing
-lookupInStack id (s : ss) = case lookup id s of
-  Just v  -> Just v
-  Nothing -> lookupInStack id ss
 
 
 interpret :: AST.Expr -> Interp Value
@@ -123,7 +104,7 @@ interpret :: AST.Expr -> Interp Value
 interpret (AST.EIdent id) = do
   let (AST.Ident name) = id
   env <- lift ask
-  case lookupInStack name env of
+  case lookup name env of
     Nothing  -> throwError $ "Unbound identifier \"" ++ name ++ "\""
     Just val -> return val
 
@@ -141,7 +122,7 @@ interpret (AST.ELit lit) = case lit of
   AST.LLambda ps exp -> do
     let ps' = map (\(AST.Ident s) -> s) ps
     env <- lift ask
-    return $ Lambda ps' (exp, empty : env)
+    return $ Lambda ps' (exp, env)
 
 interpret AST.EDefer             = return Defer
 
@@ -153,9 +134,9 @@ interpret (AST.EApply exp1 exp2) = do
   apply :: Value -> Value -> Interp Value
   apply (Lambda [] _) _ = throwError "Too many arguments for lambda."
   apply (Lambda (p : ps) c) Defer = return $ Lambda (ps ++ [p]) c
-  apply (Lambda (p : ps) (bod, e : es)) v = do
-    let e' = insert p v e
-    return $ Lambda ps (bod, e' : es)
+  apply (Lambda (p : ps) (bod, env)) v = do
+    let env' = insert p v env
+    return $ Lambda ps (bod, env')
   apply val _ = throwError $ "Cannot apply arguments to type " ++ showType val
 
 interpret (AST.EForce exp) = do
@@ -323,7 +304,7 @@ interpret (AST.EIfThen cond exp1 exp2) = do
 interpret (AST.ELetIn []       exp) = interpret exp
 interpret (AST.ELetIn (b : bs) exp) = do
   let (AST.Bind (AST.Ident id) ex) = b
-  val      <- interpret ex
-  (e : es) <- lift ask
-  let e' = insert id val e'
-  local (const (e' : es)) $ interpret (AST.ELetIn bs exp)
+  val <- interpret ex
+  env <- lift ask
+  let env' = insert id val env
+  local (const env') $ interpret (AST.ELetIn bs exp)
