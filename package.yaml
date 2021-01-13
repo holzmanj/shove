@@ -1,6 +1,6 @@
-name:                sperg
+name:                shove
 version:             0.1.0.0
-github:              "holzmanj/sperg"
+github:              "holzmanj/shove"
 license:             BSD3
 author:              "Jesse Holzman"
 maintainer:          "jesseholzman96@gmail.com"
@@ -21,7 +21,7 @@ library:
   source-dirs: src
 
 executables:
-  sperg-exe:
+  shove-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -29,10 +29,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - sperg
+    - shove
 
 tests:
-  sperg-test:
+  shove-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -40,4 +40,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - sperg
+    - shove
