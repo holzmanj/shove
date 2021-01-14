@@ -72,31 +72,20 @@ showType Void         = "Void"
 showType Defer        = "Defer"
 
 
-{-|
-Transforms a `Prog` (aka a list of bind statements) into single expression that
-can be evaluated through `interpret`.
-Specifially, the expression produced will be a 'let x in y' where 'x' is the
-list of bindings and 'y' is a call to the 'main' function (if it exists).
--}
-progToExpr :: AST.Prog -> AST.Expr
-progToExpr (AST.Program stmts) =
-  let
-    toExpBind (AST.SBind id exp) = AST.Bind id exp
-    hasMain = any (\(AST.SBind id _) -> id == AST.Ident "main") stmts
-    body    = if hasMain
-      then AST.EForce (AST.EIdent $ AST.Ident "main")
-      -- just do nop if no main was defined.
-      else AST.ELit AST.LVoid
-  in AST.ELetIn (map toExpBind stmts) body
-
-
-runInterpreter :: AST.Prog -> IO ()
-runInterpreter prog = do
-  let expr = progToExpr prog
-  res <- runReaderT (runExceptT (interpret expr)) empty
-  case res of
-    Left  err -> putStrLn $ "Runtime Error: " ++ err
-    Right val -> print val
+runInterpreter :: [AST.Stmt] -> Store -> IO Store
+runInterpreter []       store = return store
+runInterpreter (s : ss) store = case s of
+  (AST.SBind (AST.Ident i) exp) ->
+    exec exp store (\v -> runInterpreter ss (insert i v store))
+  (AST.SEval exp) -> exec exp store (\v -> print v >> runInterpreter ss store)
+ where
+  exec exp store f = do
+    res <- runReaderT (runExceptT $ interpret exp) store
+    case res of
+      Left err -> do
+        putStrLn $ "Runtime error: " ++ err
+        return store
+      Right val -> f val
 
 
 interpret :: AST.Expr -> Interp Value
