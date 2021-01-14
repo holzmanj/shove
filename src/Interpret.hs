@@ -72,6 +72,11 @@ showType Void         = "Void"
 showType Defer        = "Defer"
 
 
+-- Used to hold a lambda's reference to itself within its store
+recurseId :: String
+recurseId = "@"
+
+
 runInterpreter :: [AST.Stmt] -> Store -> IO Store
 runInterpreter []       store = return store
 runInterpreter (s : ss) store = case s of
@@ -111,9 +116,21 @@ interpret (AST.ELit lit) = case lit of
   AST.LLambda ps exp -> do
     let ps' = map (\(AST.Ident s) -> s) ps
     env <- lift ask
-    return $ Lambda ps' (exp, env)
+    let env' = insert recurseId (Lambda ps' (exp, env)) env
+    return $ Lambda ps' (exp, env')
 
-interpret AST.EDefer             = return Defer
+interpret AST.EDefer   = return Defer
+
+interpret AST.ERecurse = do
+  env <- lift ask
+  case lookup recurseId env of
+    Nothing -> throwError "Cannot recurse outside of lambda body."
+    Just (Lambda ps (exp, env)) -> do
+      -- add self-reference to store to support further recursion
+      let env' = insert recurseId (Lambda ps (exp, env)) env
+      return $ Lambda ps (exp, env')
+    Just v -> return v -- technically this shouldn't be possible
+
 
 interpret (AST.EApply exp1 exp2) = do
   f <- interpret exp1
