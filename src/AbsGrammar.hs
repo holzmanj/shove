@@ -12,7 +12,7 @@ import qualified Data.String
 newtype Ident = Ident String
   deriving (C.Eq, C.Ord, C.Show, C.Read, Data.String.IsString)
 
-newtype Prog = Program [Stmt]
+data Prog = Program [Stmt]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Stmt = SBind Ident Expr | SEval Expr
@@ -22,6 +22,7 @@ data Expr
     = EIdent Ident
     | ELit Lit
     | EDefer
+    | ERecurse
     | EApply Expr Expr
     | EForce Expr
     | EMul Expr Expr
