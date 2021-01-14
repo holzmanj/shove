@@ -12,7 +12,7 @@ import qualified Data.String
 newtype Ident = Ident String
   deriving (C.Eq, C.Ord, C.Show, C.Read, Data.String.IsString)
 
-data Prog = Program [Stmt]
+newtype Prog = Program [Stmt]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Stmt = SBind Ident Expr | SEval Expr
