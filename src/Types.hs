@@ -9,7 +9,8 @@ import qualified AbsGrammar as AST
 
 
 type Store = Map String Value
-type Closure = (AST.Expr, Store)
+data FuncBody = BuiltIn (Interp Value) | Expr AST.Expr
+type Closure = (FuncBody, Store)
 
 type Interp a = ExceptT String (ReaderT Store IO) a
 

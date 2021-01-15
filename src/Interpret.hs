@@ -8,7 +8,15 @@ import Data.Map.Strict (Map, empty, insert, lookup)
 import Data.List (intercalate)
 import Text.Printf (printf)
 import qualified AbsGrammar as AST
-import Types (MaybeOrd(tryCompare), Value(..), Interp, Store, showType)
+import Types
+  ( FuncBody(BuiltIn, Expr)
+  , MaybeOrd(tryCompare)
+  , Value(..)
+  , Interp
+  , Store
+  , showType
+  )
+import Builtins (builtinEnv)
 
 
 -- Used to hold a lambda's reference to itself within its store
@@ -38,7 +46,9 @@ interpret (AST.EIdent id) = do
   let (AST.Ident name) = id
   env <- lift ask
   case lookup name env of
-    Nothing  -> throwError $ "Unbound identifier \"" ++ name ++ "\""
+    Nothing -> case lookup name builtinEnv of
+      Nothing  -> throwError $ "Unbound identifier \"" ++ name ++ "\""
+      Just val -> return val
     Just val -> return val
 
 interpret (AST.ELit lit) = case lit of
@@ -55,8 +65,8 @@ interpret (AST.ELit lit) = case lit of
   AST.LLambda ps exp -> do
     let ps' = map (\(AST.Ident s) -> s) ps
     env <- lift ask
-    let env' = insert recurseId (Lambda ps' (exp, env)) env
-    return $ Lambda ps' (exp, env')
+    let env' = insert recurseId (Lambda ps' (Expr exp, env)) env
+    return $ Lambda ps' (Expr exp, env')
 
 interpret AST.EDefer   = return Defer
 
@@ -88,7 +98,8 @@ interpret (AST.EForce exp) = do
   force v
  where
   force :: Value -> Interp Value
-  force (Lambda [] (bod, env)) = local (const env) $ interpret bod
+  force (Lambda [] (Expr    exp, env)) = local (const env) $ interpret exp
+  force (Lambda [] (BuiltIn f  , env)) = local (const env) f
   force (Lambda _ _) =  -- nonempty params list
     throwError "Cannot force a lambda with unbound parameters."
   -- forcing a value that isn't a lambda simply returns the same value
