@@ -1,7 +1,8 @@
 module Main where
 
 import System.IO (stdout, hSetBuffering, BufferMode(NoBuffering))
-import Interpret (Store, runInterpreter)
+import Types (Store)
+import Interpret (runInterpreter)
 import qualified AbsGrammar as AST
 import ParGrammar (pProg, myLexer)
 import Data.Map (empty)

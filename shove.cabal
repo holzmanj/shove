@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4fe5403dbbb9b903154049ccc9d391fc7046f77c00f4c6b759b4696ad1bcea3e
+-- hash: 8439d0398a9ac037352faff8d13f869c83f0bb23f44ba09a55e3534971e80e48
 
 name:           shove
 version:        0.1.0.0
@@ -27,9 +27,11 @@ source-repository head
 library
   exposed-modules:
       AbsGrammar
+      Builtins
       Interpret
       LexGrammar
       ParGrammar
+      Types
   other-modules:
       Paths_shove
   hs-source-dirs:
