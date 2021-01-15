@@ -62,9 +62,9 @@ let j = [2, 4] + [6, 8] # j = [2, 4, 6, 8]
 ```
 Behind the scenes, lists behave like stacks (akin to other functional languages).  Elements are added to the front of a list with the `::` (cons) operator.
 ```coffee
-let k = 4 :: [3, 2, 1]  # j = [4, 3, 2, 1]
-let l = 5 :: j          # k = [5, 4, 3, 2, 1]
-let m = true :: []      # l = [true]
+let k = 4 :: [3, 2, 1]  # k = [4, 3, 2, 1]
+let l = 5 :: k          # l = [5, 4, 3, 2, 1]
+let m = true :: []      # m = [true]
 ```
 
 
