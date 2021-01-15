@@ -54,7 +54,7 @@ alex_base = listArray (0 :: Int, 48)
   , 0
   , 1835
   , -38
-  , 70
+  , 71
   , 114
   , 2081
   , 1964
@@ -63,7 +63,7 @@ alex_base = listArray (0 :: Int, 48)
   , 2273
   , 0
   , 2519
-  , 119
+  , 120
   , -52
   , 0
   , -42
@@ -195,6 +195,7 @@ alex_table = listArray (0 :: Int, 2991)
   , 41
   , 41
   , 41
+  , 41
   , 47
   , 47
   , 47
@@ -210,7 +211,6 @@ alex_table = listArray (0 :: Int, 2991)
   , 39
   , 39
   , 39
-  , 0
   , 0
   , 0
   , 0
@@ -228,8 +228,8 @@ alex_table = listArray (0 :: Int, 2991)
   , 0
   , 0
   , 0
-  , 39
   , 0
+  , 39
   , 0
   , 0
   , 1
@@ -3191,6 +3191,7 @@ alex_check = listArray (0 :: Int, 2991)
   , 123
   , 124
   , 125
+  , 126
   , 48
   , 49
   , 50
@@ -3209,7 +3210,6 @@ alex_check = listArray (0 :: Int, 2991)
   , -1
   , -1
   , -1
-  , -1
   , 92
   , -1
   , -1
@@ -3224,8 +3224,8 @@ alex_check = listArray (0 :: Int, 2991)
   , -1
   , -1
   , -1
-  , 32
   , -1
+  , 32
   , -1
   , -1
   , 110
@@ -6252,7 +6252,7 @@ eitherResIdent tv s = treeFind resWords
                               | s == a = t
 
 resWords :: BTree
-resWords = b ">" 19 (b "-" 10 (b "(" 5 (b "#" 3 (b "!=" 2 (b "!" 1 N N) N) (b "%" 4 N N)) (b "+" 8 (b "*" 7 (b ")" 6 N N) N) (b "," 9 N N))) (b "<" 15 (b "::" 13 (b "/" 12 (b "->" 11 N N) N) (b ";" 14 N N)) (b "=" 17 (b "<=" 16 N N) (b "==" 18 N N)))) (b "in" 28 (b "and" 24 (b "[" 22 (b "@" 21 (b ">=" 20 N N) N) (b "]" 23 N N)) (b "false" 26 (b "else" 25 N N) (b "if" 27 N N))) (b "void" 33 (b "then" 31 (b "or" 30 (b "let" 29 N N) N) (b "true" 32 N N)) (b "|" 35 (b "{" 34 N N) (b "}" 36 N N))))
+resWords = b ">=" 19 (b "->" 10 (b ")" 5 (b "%" 3 (b "!=" 2 (b "!" 1 N N) N) (b "(" 4 N N)) (b "," 8 (b "+" 7 (b "*" 6 N N) N) (b "-" 9 N N))) (b "<=" 15 (b ";" 13 (b "::" 12 (b "/" 11 N N) N) (b "<" 14 N N)) (b "==" 17 (b "=" 16 N N) (b ">" 18 N N)))) (b "let" 28 (b "else" 24 (b "]" 22 (b "[" 21 (b "@" 20 N N) N) (b "and" 23 N N)) (b "if" 26 (b "false" 25 N N) (b "in" 27 N N))) (b "{" 33 (b "true" 31 (b "then" 30 (b "or" 29 N N) N) (b "void" 32 N N)) (b "}" 35 (b "|" 34 N N) (b "~" 36 N N))))
    where b s n = let bs = s
                  in  B bs (TS bs n)
 
