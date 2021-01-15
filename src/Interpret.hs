@@ -26,15 +26,14 @@ data Value
   | Defer
 
 instance Eq Value where
-  (Bool   i       ) == (Bool   j       ) = i == j
-  (Int    i       ) == (Int    j       ) = i == j
-  (Double i       ) == (Double j       ) = i == j
-  (Char   i       ) == (Char   j       ) = i == j
-  (String i       ) == (String j       ) = i == j
-  (List   []      ) == (List   []      ) = True
-  (List   (x : xs)) == (List   (y : ys)) = x == y && xs == ys
-  Void              == Void              = True
-  _                 == _                 = False
+  (Bool   i) == (Bool   j) = i == j
+  (Int    i) == (Int    j) = i == j
+  (Double i) == (Double j) = i == j
+  (Char   i) == (Char   j) = i == j
+  (String i) == (String j) = i == j
+  (List   i) == (List   j) = i == j
+  Void       == Void       = True
+  _          == _          = False
 
 class MaybeOrd a where
   tryCompare :: a -> a -> Maybe Ordering
@@ -55,7 +54,7 @@ instance Show Value where
   show (Char   c  ) = show c
   show (String s  ) = s
   show (List   l  ) = "[" ++ intercalate "," (map show l) ++ "]"
-  show (Lambda _ _) = "<function>"
+  show (Lambda _ _) = "<lambda>"
   show Void         = "<void>"
   show Defer        = "<defer>"
 
@@ -130,7 +129,6 @@ interpret AST.ERecurse = do
       let env' = insert recurseId (Lambda ps (exp, env)) env
       return $ Lambda ps (exp, env')
     Just v -> return v -- technically this shouldn't be possible
-
 
 interpret (AST.EApply exp1 exp2) = do
   f <- interpret exp1
@@ -262,18 +260,12 @@ interpret (AST.EMoreEq exp1 exp2) = do
 interpret (AST.EEqual exp1 exp2) = do
   v1 <- interpret exp1
   v2 <- interpret exp2
-  case tryCompare v1 v2 of
-    Just ord -> return $ Bool (ord == EQ)
-    Nothing  -> throwError
-      $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
+  return $ Bool (v1 == v2)
 
 interpret (AST.ENEqual exp1 exp2) = do
   v1 <- interpret exp1
   v2 <- interpret exp2
-  case tryCompare v1 v2 of
-    Just ord -> return $ Bool (ord /= EQ)
-    Nothing  -> throwError
-      $ printf "Cannot compare types %s and %s." (showType v1) (showType v2)
+  return $ Bool (v1 /= v2)
 
 interpret (AST.EAnd exp1 exp2) = do
   v1 <- interpret exp1
