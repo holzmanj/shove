@@ -150,6 +150,7 @@ interpret (AST.EAdd exp1 exp2) = do
  where
   evalAdd (Int    i) (Int    j) = Just $ Int (i + j)
   evalAdd (Double i) (Double j) = Just $ Double (i + j)
+  evalAdd (String i) (String j) = Just $ String (i ++ j)
   evalAdd (List   i) (List   j) = Just $ List (i ++ j)
   evalAdd _          _          = Nothing
 
