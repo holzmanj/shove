@@ -12,10 +12,13 @@ import qualified Data.String
 newtype Ident = Ident String
   deriving (C.Eq, C.Ord, C.Show, C.Read, Data.String.IsString)
 
-data Prog = Program [Stmt]
+newtype Prog = Program [Stmt]
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
-data Stmt = SBind Ident Expr | SEval Expr
+data Stmt = SBind Ident Expr
+  deriving (C.Eq, C.Ord, C.Show, C.Read)
+
+data ReplCmd = RBind Ident Expr | REval Expr
   deriving (C.Eq, C.Ord, C.Show, C.Read)
 
 data Expr
