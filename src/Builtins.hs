@@ -7,8 +7,7 @@ import Control.Monad.Except (MonadError(throwError))
 import Control.Monad.Reader (MonadReader(ask))
 
 import qualified AbsGrammar as AST
-import Types
-  (Value(String, Void, Int, Lambda, List), Interp, Store, FuncBody(BuiltIn))
+import Types (Value(..), Interp, Store, FuncBody(BuiltIn))
 
 
 paramList :: Int -> [String]
