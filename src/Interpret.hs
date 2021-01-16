@@ -24,20 +24,8 @@ recurseId :: String
 recurseId = "@"
 
 
-runInterpreter :: [AST.Stmt] -> Store -> IO Store
-runInterpreter []       store = return store
-runInterpreter (s : ss) store = case s of
-  (AST.SBind (AST.Ident i) exp) ->
-    exec exp store (\v -> runInterpreter ss (insert i v store))
-  (AST.SEval exp) -> exec exp store (\v -> print v >> runInterpreter ss store)
- where
-  exec exp store f = do
-    res <- runReaderT (runExceptT $ interpret exp) store
-    case res of
-      Left err -> do
-        putStrLn $ "Runtime error: " ++ err
-        return store
-      Right val -> f val
+runInterpreter :: AST.Expr -> Store -> IO (Either String Value)
+runInterpreter exp = runReaderT (runExceptT $ interpret exp)
 
 
 interpret :: AST.Expr -> Interp Value
