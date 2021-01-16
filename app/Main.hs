@@ -4,7 +4,7 @@ import Prelude hiding (lookup)
 import System.Environment (getArgs)
 import System.IO (stdout, hSetBuffering, BufferMode(NoBuffering))
 import Types (Value(..), FuncBody(..), Store)
-import Interpret (interpret, runMain, runInterpreter)
+import Interpret (interpret, runInterpreter)
 import qualified AbsGrammar as AST
 import ParGrammar (pReplCmd, pProg, myLexer)
 import Data.Map (insert, empty, lookup)
