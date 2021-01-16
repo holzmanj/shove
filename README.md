@@ -126,6 +126,7 @@ let val = !add 3 5
 ```
 
 This is really just some syntactic sugar, but the idea here is that we can elegantly chain operations together into a sort of data pipeline.
+`->` is left-associative and has the lowest operator precedence in the language, which means everything to the left of the operator gets evaluated 
 ```coffee
 let val = 10 -> double -> add 3 -> double    # val = 46
 ```
@@ -134,19 +135,36 @@ Now for example let's say we have a subtraction function defined like this:
 let sub = { x, y | x - y }
 ```
 Ok so far so good.
-Now let's say we also have some number bound to `x`, and we want to use our subtraction function to do `x - 5` (a stupid example, but bear with me).
+Now let's say we also have some number bound to `n`, and we want to use our subtraction function to do `n - 5` (a stupid example, but bear with me).
 
 If we were to do:
 ```coffee
-x -> sub 5
+n -> sub 5
 ```
-That would become `!sub 5 x`, which is actually `5 - x`! So what can we do?
+That would become `!sub 5 n`, which is actually `5 - n`! So what can we do?
 
-Introducing yet another special operator: `~` (defer). On a practical level, the defer operator lets us change which parameter receives `->`'s left operand.
+Introducing yet another special operator: `~` (defer). On a practical level, the defer operator lets us change which parameter on the right receives `->`'s left operand.
 ```coffee
-x -> sub ~ 5
+n -> sub ~ 5
 ```
-Now instead of `x` being applied as `sub`'s *second* argument, it gets applied as its *first* argument! Wow! Now we've actually got `x - 5` just like we wanted.
+Now instead of `n` being applied as `sub`'s *second* argument, it gets applied as its *first* argument! Wow! Now we've actually got `n - 5` just like we wanted.
+
+Behind the scenes, `~` actually *defers* whichever parameter the lambda is expecting next, so that it is instead the last argument that gets applied to the lambda.
+
+For example, let's make a function that concatenates three strings.
+```coffee
+let cat3 = { a, b, c | a + b + c }
+
+let val1 = cat3 "foo" "bar" "baz"
+let val2 = cat3  ~ "bar" "baz" "foo"
+let val3 = cat3 "foo" ~ "baz" "bar"
+```
+`val`, `val2`, and `val3` are all equivalently evaluated as `"foobarbaz"`
+(`val2` defers `cat3`'s `a` param to be the last positional argument, and `val3` instead defers the `b` param to be the last positional argument).
+
+Technically you can add multiple `~`s in a row which would just continue rotating the lambda's remaining unapplied parameters, but you probably shouldn't ever do that because it serves no purpose other than making your code confusing and unreadable.
+
+In general, it's best to simply think of `~` as a placeholder for the input of a function in a pipeline.
 
 
 
@@ -205,12 +223,12 @@ Like other expression-oriented languages, Shove has no loops and so instead we i
 We can use the `@` operator to reference a lambda from within its own body.
 ```coffee
 let count_down = { n |
-  if n == 0
+  if n < 0
     then []
     else n :: (n - 1 -> @)
 }
 
-let l = !count_down 5  # l = [5, 4, 3, 2, 1]
+let l = !count_down 5  # l = [5, 4, 3, 2, 1, 0]
 ```
 This is a bit more flexible than calling the function by name (like you're probably used to), because now we can create anonymous functions that recurse.
 
