@@ -25,8 +25,9 @@ builtinEnv = fromList
   ]
 
 
--- | List Operations
+-- LIST OPERATIONS
 
+-- | Get the first element of a list.
 bHead :: Interp Value
 bHead = do
   let [p] = paramList 1
@@ -38,6 +39,7 @@ bHead = do
     Just _ -> throwError "Cannot evaluate head of something that's not a list."
 
 
+-- | Get a list excluding its first element.
 bTail :: Interp Value
 bTail = do
   let [p] = paramList 1
@@ -49,6 +51,7 @@ bTail = do
     Just _ -> throwError "Cannot evaluate tail of something that's not a list."
 
 
+-- | Count the number of elements in a list.
 bLength :: Interp Value
 bLength = do
   let [p] = paramList 1
@@ -59,8 +62,10 @@ bLength = do
     Just _ -> throwError "Cannot evaluate tail of something that's not a list."
 
 
+
 -- | IO 
 
+-- | Print a value to stdout (no trailing newline).
 bPrint :: Interp Value
 bPrint = do
   let [p] = paramList 1
@@ -72,6 +77,7 @@ bPrint = do
       return Void
 
 
+-- | Print a value to stdout, followed by a newline.
 bPrintln :: Interp Value
 bPrintln = do
   let [p] = paramList 1
@@ -83,6 +89,7 @@ bPrintln = do
       return Void
 
 
+-- | Read a line of input from stdin, return the line as a string.
 bReadln :: Interp Value
 bReadln = do
   line <- liftIO getLine
