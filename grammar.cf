@@ -31,6 +31,7 @@ ENEqual.    Expr4   ::= Expr5 "!=" Expr5 ;
 EAnd.       Expr3   ::= Expr4 "and" Expr3 ;
 EOr.        Expr2   ::= Expr3 "or" Expr2 ;
 EShove.     Expr1   ::= Expr1 "->" Expr2 ;
+ETrigger.   Expr1   ::= Expr1 "|>" Expr2 ;
 EIfThen.    Expr    ::= "if" Expr "then" Expr "else" Expr ;
 ELetIn.     Expr    ::= "let" [Bind] "in" Expr ;
 coercions Expr 11 ;

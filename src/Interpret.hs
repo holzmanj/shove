@@ -232,6 +232,9 @@ interpret (AST.EOr exp1 exp2) = do
 interpret (AST.EShove exp1 exp2) =
   interpret (AST.EForce (AST.EApply exp2 exp1))
 
+interpret (AST.ETrigger exp1 exp2) =
+  interpret exp1 >> interpret (AST.EForce exp2)
+
 interpret (AST.EIfThen cond exp1 exp2) = do
   res <- interpret cond
   case res of

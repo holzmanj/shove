@@ -43,6 +43,7 @@ data Expr
     | EAnd Expr Expr
     | EOr Expr Expr
     | EShove Expr Expr
+    | ETrigger Expr Expr
     | EIfThen Expr Expr Expr
     | ELetIn [Bind] Expr
   deriving (C.Eq, C.Ord, C.Show, C.Read)
