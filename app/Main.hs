@@ -62,9 +62,9 @@ repl env = do
 
 main :: IO ()
 main = do
+  hSetBuffering stdout NoBuffering
   args <- getArgs
   case args of
     [] -> do
-      hSetBuffering stdout NoBuffering
       repl empty
     (x : _) -> runProgram x
