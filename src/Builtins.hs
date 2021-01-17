@@ -7,7 +7,7 @@ import Control.Monad.Except (MonadError(throwError))
 import Control.Monad.Reader (MonadReader(ask))
 
 import qualified AbsGrammar as AST
-import Types (Value(..), Interp, Store, FuncBody(BuiltIn))
+import Types (showType, Value(..), Interp, Store, FuncBody(BuiltIn))
 
 
 paramList :: Int -> [String]
@@ -32,13 +32,49 @@ getParams n = do
 
 builtinEnv :: Store
 builtinEnv = fromList
-  [ ("head"   , Lambda (paramList 1) (BuiltIn bHead, empty))
+  [ ("floor"  , Lambda (paramList 1) (BuiltIn bFloor, empty))
+  , ("ceil"   , Lambda (paramList 1) (BuiltIn bCeil, empty))
+  , ("round"  , Lambda (paramList 1) (BuiltIn bRound, empty))
+  , ("head"   , Lambda (paramList 1) (BuiltIn bHead, empty))
   , ("tail"   , Lambda (paramList 1) (BuiltIn bTail, empty))
   , ("length" , Lambda (paramList 1) (BuiltIn bLength, empty))
   , ("print"  , Lambda (paramList 1) (BuiltIn bPrint, empty))
   , ("println", Lambda (paramList 1) (BuiltIn bPrintln, empty))
   , ("readln" , Lambda [] (BuiltIn bReadln, empty))
   ]
+
+
+-- DOUBLE TO INT CONVERSIONS
+
+-- | Convert a double d to closest integer i, where i <= d
+bFloor :: Interp Value
+bFloor = do
+  [p] <- getParams 1
+  case p of
+    Double f -> return $ Int (floor f)
+    Int    i -> return $ Int i
+    v        -> throwError $ "Cannot evaluate \"floor\" for type " ++ showType v
+
+
+-- | Convert a double d to closest integer i, where i >= d
+bCeil :: Interp Value
+bCeil = do
+  [p] <- getParams 1
+  case p of
+    Double f -> return $ Int (ceiling f)
+    Int    i -> return $ Int i
+    v        -> throwError $ "Cannot evaluate \"ceil\" for type " ++ showType v
+
+
+-- | Convert a double to closest integer 
+bRound :: Interp Value
+bRound = do
+  [p] <- getParams 1
+  case p of
+    Double f -> return $ Int (round f)
+    Int    i -> return $ Int i
+    v        -> throwError $ "Cannot evaluate \"round\" for type " ++ showType v
+
 
 
 -- LIST OPERATIONS
