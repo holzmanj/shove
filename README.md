@@ -166,6 +166,14 @@ Technically you can add multiple `~`s in a row which would just continue rotatin
 
 In general, it's best to simply think of `~` as a placeholder for the input of a function in a pipeline.
 
+There is also an operator very similar (both in form and function) to `->`, which is `|>` (trigger).
+In essence, `|>` is a version of `->` which doesn't apply anything to its right operand before forcing it.  It will evaluate its left operand, ignore the result, and then perform a `!` on its right operand.
+```coffee
+# note that `10 -> double` is actually evaluated, but its result is ignored.
+let val = 10 -> double |> cat3 "a" "b" "c"  # val = "abc"
+```
+This allows us to compose operations in an almost imperative way, and is mostly useful for sequencing operations that contain IO effects like printing console output, getting input from the user, etc.
+
 
 
 ### Lambdas are First-Class
@@ -234,7 +242,7 @@ This is a bit more flexible than calling the function by name (like you're proba
 
 For example, if we wanted to quickly calculate 10 factorial without defining a separate `factorial` function, we could just do this:
 ```coffee
-10 -> { n | if n = 1 then n else n * (n - 1 -> @)}
+10 -> { n | if n <= 1 then 1 else n * (n - 1 -> @)}
 ```
 Wow, that's pretty neat!
 
