@@ -5,6 +5,7 @@ import Data.Map (lookup, Map, empty, fromList)
 import Control.Monad.Trans (MonadIO(liftIO), MonadTrans(lift))
 import Control.Monad.Except (MonadError(throwError))
 import Control.Monad.Reader (MonadReader(ask))
+import System.Random (Random(randomRIO, randomIO))
 
 import qualified AbsGrammar as AST
 import Types (showType, Value(..), Interp, Store, FuncBody(BuiltIn))
@@ -35,6 +36,8 @@ builtinEnv = fromList
   [ ("floor"  , Lambda (paramList 1) (BuiltIn bFloor, empty))
   , ("ceil"   , Lambda (paramList 1) (BuiltIn bCeil, empty))
   , ("round"  , Lambda (paramList 1) (BuiltIn bRound, empty))
+  , ("rand"   , Lambda [] (BuiltIn bRand, empty))
+  , ("randint", Lambda (paramList 2) (BuiltIn bRandint, empty))
   , ("head"   , Lambda (paramList 1) (BuiltIn bHead, empty))
   , ("tail"   , Lambda (paramList 1) (BuiltIn bTail, empty))
   , ("length" , Lambda (paramList 1) (BuiltIn bLength, empty))
@@ -56,6 +59,7 @@ bFloor = do
     v        -> throwError $ "Cannot evaluate \"floor\" for type " ++ showType v
 
 
+
 -- | Convert a double d to closest integer i, where i >= d
 bCeil :: Interp Value
 bCeil = do
@@ -74,6 +78,33 @@ bRound = do
     Double f -> return $ Int (round f)
     Int    i -> return $ Int i
     v        -> throwError $ "Cannot evaluate \"round\" for type " ++ showType v
+
+
+
+-- RANDOM NUMBER GENERATION
+
+-- | Generate a random double in the range [0,1)
+bRand :: Interp Value
+bRand = do
+  r <- liftIO (randomIO :: IO Double)
+  return $ Double r
+
+
+-- | Take two integers and generate a random in the range between them
+bRandint :: Interp Value
+bRandint = do
+  [lo, hi] <- getParams 2
+  case lo of
+    Int i -> case hi of
+      Int j -> if i <= j
+        then do
+          r <- liftIO $ randomRIO (i, j)
+          return $ Int r
+        else do
+          r <- liftIO $ randomRIO (j, i)
+          return $ Int r
+      _ -> throwError "Cannot evaluate \"randint\" with non-integer arguments."
+    _ -> throwError "Cannot evaluate \"randint\" with non-integer arguments."
 
 
 

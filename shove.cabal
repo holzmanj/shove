@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8439d0398a9ac037352faff8d13f869c83f0bb23f44ba09a55e3534971e80e48
+-- hash: c7bcce415e2ad57e22c3cd2cdcfa0b5d2978db0571f7f77d1e3792e7672b1a2a
 
 name:           shove
 version:        0.1.0.0
@@ -41,6 +41,7 @@ library
     , base >=4.7 && <5
     , containers
     , mtl
+    , random
   default-language: Haskell2010
 
 executable shove-exe
@@ -55,6 +56,7 @@ executable shove-exe
     , base >=4.7 && <5
     , containers
     , mtl
+    , random
     , shove
   default-language: Haskell2010
 
@@ -71,5 +73,6 @@ test-suite shove-test
     , base >=4.7 && <5
     , containers
     , mtl
+    , random
     , shove
   default-language: Haskell2010
