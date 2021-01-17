@@ -9,6 +9,7 @@ import System.Random (Random(randomRIO, randomIO))
 
 import qualified AbsGrammar as AST
 import Types (showType, Value(..), Interp, Store, FuncBody(BuiltIn))
+import Text.Read (readMaybe)
 
 
 paramList :: Int -> [String]
@@ -33,18 +34,22 @@ getParams n = do
 
 builtinEnv :: Store
 builtinEnv = fromList
-  [ ("floor"  , Lambda (paramList 1) (BuiltIn bFloor, empty))
-  , ("ceil"   , Lambda (paramList 1) (BuiltIn bCeil, empty))
-  , ("round"  , Lambda (paramList 1) (BuiltIn bRound, empty))
-  , ("rand"   , Lambda [] (BuiltIn bRand, empty))
-  , ("randint", Lambda (paramList 2) (BuiltIn bRandint, empty))
-  , ("head"   , Lambda (paramList 1) (BuiltIn bHead, empty))
-  , ("tail"   , Lambda (paramList 1) (BuiltIn bTail, empty))
-  , ("length" , Lambda (paramList 1) (BuiltIn bLength, empty))
-  , ("print"  , Lambda (paramList 1) (BuiltIn bPrint, empty))
-  , ("println", Lambda (paramList 1) (BuiltIn bPrintln, empty))
-  , ("readln" , Lambda [] (BuiltIn bReadln, empty))
+  [ ("floor"   , Lambda (paramList 1) (BuiltIn bFloor, empty))
+  , ("ceil"    , Lambda (paramList 1) (BuiltIn bCeil, empty))
+  , ("round"   , Lambda (paramList 1) (BuiltIn bRound, empty))
+  , ("parseint", Lambda (paramList 1) (BuiltIn bParseInt, empty))
+  , ("parsedbl", Lambda (paramList 1) (BuiltIn bParseDouble, empty))
+  , ("tostr"   , Lambda (paramList 1) (BuiltIn bStr, empty))
+  , ("rand"    , Lambda (paramList 0) (BuiltIn bRand, empty))
+  , ("randint" , Lambda (paramList 2) (BuiltIn bRandint, empty))
+  , ("head"    , Lambda (paramList 1) (BuiltIn bHead, empty))
+  , ("tail"    , Lambda (paramList 1) (BuiltIn bTail, empty))
+  , ("length"  , Lambda (paramList 1) (BuiltIn bLength, empty))
+  , ("print"   , Lambda (paramList 1) (BuiltIn bPrint, empty))
+  , ("println" , Lambda (paramList 1) (BuiltIn bPrintln, empty))
+  , ("readln"  , Lambda (paramList 0) (BuiltIn bReadln, empty))
   ]
+
 
 
 -- DOUBLE TO INT CONVERSIONS
@@ -78,6 +83,41 @@ bRound = do
     Double f -> return $ Int (round f)
     Int    i -> return $ Int i
     v        -> throwError $ "Cannot evaluate \"round\" for type " ++ showType v
+
+
+
+-- PARSING VALUES FROM STRINGS
+
+-- | Extract an integer value from a string, return void on failure.
+bParseInt :: Interp Value
+bParseInt = do
+  [p] <- getParams 1
+  case p of
+    String s -> case readMaybe s :: Maybe Integer of
+      Just i  -> return $ Int i
+      Nothing -> return Void
+    v -> throwError $ "Cannot parse integer from type " ++ showType v
+
+
+-- | Extract a floating-point value from a string, return void on failure.
+bParseDouble :: Interp Value
+bParseDouble = do
+  [p] <- getParams 1
+  case p of
+    String s -> case readMaybe s :: Maybe Double of
+      Just d  -> return $ Double d
+      Nothing -> return Void
+    v -> throwError $ "Cannot parse double from type " ++ showType v
+
+
+
+-- WRITING VALUES TO STRINGS
+
+-- | Convert a value to its string representation.
+bStr :: Interp Value
+bStr = do
+  [p] <- getParams 1
+  return $ String (show p)
 
 
 
