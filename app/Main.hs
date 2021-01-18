@@ -2,6 +2,7 @@ module Main where
 
 import Prelude hiding (lookup)
 import System.Environment (getArgs)
+import System.Console.Haskeline
 import System.IO (stdout, hSetBuffering, BufferMode(NoBuffering))
 import Types (Value(..), FuncBody(..), Store)
 import Interpret (interpret, runInterpreter)
@@ -10,6 +11,7 @@ import ParGrammar (pReplCmd, pProg, myLexer)
 import Data.Map (insert, empty, lookup)
 import Control.Monad.Reader (ReaderT(runReaderT))
 import Control.Monad.Except (runExceptT)
+import Control.Monad.Trans (MonadIO(liftIO))
 
 
 printErr :: String -> IO ()
@@ -44,20 +46,26 @@ runProgram filename = do
     handleResult (return env) (\v -> makeEnv ss (insert ident v env)) res
 
 
-repl :: Store -> IO ()
+repl :: Store -> InputT IO ()
 repl env = do
-  putStr "\x1b[36mshove> \x1b[0m"
-  line <- getLine
-  case pReplCmd $ myLexer line of
+  input <- getInputLine "\x1b[36m~> \x1b[0m"
+  case input of
+    Nothing     -> return ()
+    Just "exit" -> return ()
+    Just line   -> do
+      env' <- liftIO $ runCmd env $ pReplCmd (myLexer line)
+      repl env'
+ where
+  runCmd env parseResult = case parseResult of
     Left err -> do
       printErr $ "Parsing error: " ++ err
-      repl env
+      return env
     Right (AST.RBind (AST.Ident ident) exp) -> do
       res <- runInterpreter exp env
-      handleResult (repl env) (\v -> repl $ insert ident v env) res
+      handleResult (return env) (\v -> return $ insert ident v env) res
     Right (AST.REval exp) -> do
       res <- runInterpreter exp env
-      handleResult (repl env) (\v -> print v >> repl env) res
+      handleResult (return env) (\v -> print v >> return env) res
 
 
 main :: IO ()
@@ -66,5 +74,5 @@ main = do
   args <- getArgs
   case args of
     [] -> do
-      repl empty
+      runInputT defaultSettings (repl empty)
     (x : _) -> runProgram x

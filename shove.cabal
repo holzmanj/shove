@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c7bcce415e2ad57e22c3cd2cdcfa0b5d2978db0571f7f77d1e3792e7672b1a2a
+-- hash: d2505b859a575c03104d49c5e8cf1116bac09e26079e395c1e95110ca34e10ac
 
 name:           shove
 version:        0.1.0.0
@@ -40,6 +40,7 @@ library
       array
     , base >=4.7 && <5
     , containers
+    , haskeline
     , mtl
     , random
   default-language: Haskell2010
@@ -55,6 +56,7 @@ executable shove-exe
       array
     , base >=4.7 && <5
     , containers
+    , haskeline
     , mtl
     , random
     , shove
@@ -72,6 +74,7 @@ test-suite shove-test
       array
     , base >=4.7 && <5
     , containers
+    , haskeline
     , mtl
     , random
     , shove
