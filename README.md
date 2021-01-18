@@ -1,7 +1,7 @@
 # SHOVE
-A little expression-oriented programming language with some fun/weird features.
+A small expression-oriented programming language with some fun/weird features.
 
-*(This is really just a PL design experiment I did for fun, so don't expect it to be well thought-out or useful).*
+*(This is really just a language design experiment I did for fun, so don't expect it to be well thought-out or useful).*
 
 
 ## Syntax
@@ -55,10 +55,12 @@ let g = void
 Shove also lets you build lists of values.
 ```coffee
 let h = [1, 2, 3, 4]
+
 # list elements aren't restricted to a single type
 let i = ["blah", 21, false]
+
 # lists can be concatenated together with `+`
-let j = [2, 4] + [6, 8] # j = [2, 4, 6, 8]
+let j = [2, 4] + [6, 8]   # j = [2, 4, 6, 8]
 ```
 Behind the scenes, lists behave like stacks (akin to other functional languages).  Elements are added to the front of a list with the `::` (cons) operator.
 ```coffee
@@ -88,7 +90,7 @@ let linear = { m, b, x |
   m * x + b
 }
 ```
-Arguments are applied to lambdas in typical ML fashion by following the lambda with a number of whitespace-separated values.
+Arguments are given to lambdas in typical ML fashion by following the lambda (or the name it's bound to) with a number of space-separated values.
 ```coffee
 let o = double 3
 let p = add 4 6
@@ -98,7 +100,7 @@ let q = add 10
 let r = q 5
 let s = add 10 5    # q and s are equivalent
 ```
-Now the part that might seem odd is that `o` and `p` don't immediately evaluate to `6` and `10` respectively. Even `n`, which we defined above, doesn't actually hold the value `5`.
+Now the part that might seem odd is that `o` and `p` don't immediately evaluate to `6` and `10` respectively. Even `n`, which we defined above, is not actually equal to `5`.
 
 Lambdas in Shove are *very* lazily evaluated, which means that `n`, `o`, and `p` are actually suspended expressions which won't evaluate to a value until they're explicitly told to.
 
@@ -112,25 +114,31 @@ Now we can actually get results from our functions. Very cool!
 
 
 ### Pipelines
-There is also a kind of similar "shove" operator (the namesake of the language) that is written as `->`.
-The shove operator will take the value on its left, apply it to the value on its right, and then force the evaluation of the result. This might sound confusing so let's look at an example.
+There are a few more operators that play into this mechanic which let us compose lambdas into a sort of data pipeline.
+The most fundamental of these (and the namesake of the language) is `->` (shove).
+
+The `->` operator takes the value on its left, and "shoves" it into the expression on its right, where "shoving" is just a combination of function application and forcing (in that order).
+
+
 ```coffee
 let val = 10 -> double   # val = 20
 ```
 The `->` takes `10`, applies it to `double` and then forces `double 10` to evaluate to `20`.
-An important detail is that, by default, `->` will always apply its left operand as the last argument of the lambda to its right.
-```coffee
-let val = 5 -> add 3
-# the above can be rewritten as:
-let val = !add 3 5
-```
 
-This is really just some syntactic sugar, but the idea here is that we can elegantly chain operations together into a sort of data pipeline.
-`->` is left-associative and has the lowest operator precedence in the language, which means everything to the left of the operator gets evaluated 
+Now this might just seem like pointless syntactic sugar for `!double 10` (and it is), but when we add more functions into the mix, it becomes a nice-looking way to compose operations on a piece of data.
 ```coffee
 let val = 10 -> double -> add 3 -> double    # val = 46
 ```
-Now for example let's say we have a subtraction function defined like this:
+It's important to know that `->` is left-associative and has the lowest operator precedence in the entire language, which means the above expression gets evaluated like this:
+```coffee
+10 -> double -> add 3 -> double
+          20 -> add 3 -> double
+                   23 -> double
+                             46
+```
+So you can think of your data as if it's following the arrows from left to right, passing through each of the functions. 
+
+But there's a problem: let's say we have a subtraction function defined like this:
 ```coffee
 let sub = { x, y | x - y }
 ```
@@ -143,33 +151,36 @@ n -> sub 5
 ```
 That would become `!sub 5 n`, which is actually `5 - n`! So what can we do?
 
-Introducing yet another special operator: `~` (defer). On a practical level, the defer operator lets us change which parameter on the right receives `->`'s left operand.
+By default, `->` takes the value on its left and "shoves" it onto the end of the expression on its right, but we can actually change where that value gets "shoved" by using another operator: `~` (defer).
 ```coffee
 n -> sub ~ 5
 ```
-Now instead of `n` being applied as `sub`'s *second* argument, it gets applied as its *first* argument! Wow! Now we've actually got `n - 5` just like we wanted.
+Now instead of `n` being applied as `sub`'s *second* argument, it gets applied where we put the `~`, as the *first* argument! Wow! Now we've actually got `n - 5` just like we wanted.
 
 Behind the scenes, `~` actually *defers* whichever parameter the lambda is expecting next, so that it is instead the last argument that gets applied to the lambda.
 
 For example, let's make a function that concatenates three strings.
 ```coffee
 let cat3 = { a, b, c | a + b + c }
-
+```
+Now let's mess with the arguments using `~`.
+```coffee
 let val1 = cat3 "foo" "bar" "baz"
 let val2 = cat3  ~ "bar" "baz" "foo"
 let val3 = cat3 "foo" ~ "baz" "bar"
+let val4 = cat3 "foo" "bar" ~ "baz"
 ```
-`val`, `val2`, and `val3` are all equivalently evaluated as `"foobarbaz"`
+The above functions are all equivalently evaluated as `"foobarbaz"`
 (`val2` defers `cat3`'s `a` param to be the last positional argument, and `val3` instead defers the `b` param to be the last positional argument).
 
 Technically you can add multiple `~`s in a row which would just continue rotating the lambda's remaining unapplied parameters, but you probably shouldn't ever do that because it serves no purpose other than making your code confusing and unreadable.
 
 In general, it's best to simply think of `~` as a placeholder for the input of a function in a pipeline.
 
-There is also an operator very similar (both in form and function) to `->`, which is `|>` (trigger).
+There is also an operator that's similar (both in form and function) to `->`, which is `|>` (trigger).
 In essence, `|>` is a version of `->` which doesn't apply anything to its right operand before forcing it.  It will evaluate its left operand, ignore the result, and then perform a `!` on its right operand.
 ```coffee
-# note that `10 -> double` is actually evaluated, but its result is ignored.
+# note that `10 -> double` is actually evaluated, but its result is discarded.
 let val = 10 -> double |> cat3 "a" "b" "c"  # val = "abc"
 ```
 This allows us to compose operations in an almost imperative way, and is mostly useful for sequencing operations that contain IO effects like printing console output, getting input from the user, etc.
@@ -216,12 +227,12 @@ let f = { x |       # f(x) = x^2 + x
 Any bindings between `let` and `in` are in scope only for the expression following the `in`.
 You can also specify multiple bindings by separating them with commas.
 ```coffee
-let g = 
+let g =       # g = "a string.another string."
   let
     foo = "a string.",
     bar = "another string."
   in
-    foo + bar   # g = "a string.another string."
+    foo + bar
 ```
 
 
